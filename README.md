@@ -4,7 +4,6 @@
 <!-- PROJECT SHIELDS -->
 [![CI][ci-shield]][ci-url]
 [![License][license-shield]][license-url]
-[![Chrome Web Store][cws-shield]][cws-url]
 [![Manifest V3][mv3-shield]][mv3-url]
 [![TypeScript][ts-shield]][ts-url]
 
@@ -32,9 +31,6 @@
     <a href="https://github.com/OniVe/docs-masked-relay/issues">Предложить функцию</a>
   </p>
 </div>
-
-<!-- STATUS -->
-> **Статус:** Chrome Web Store — исправленная заявка отправлена повторно и находится на проверке; расширение ещё не опубликовано, публичной ссылки пока нет — она появится после одобрения. Edge Add-ons не отправлен. Safari — отдельный macOS-трек. Текущая версия — `0.2.0`.
 
 <!-- TABLE OF CONTENTS -->
 <details>
@@ -114,9 +110,8 @@ DocsMasked Relay — браузерное расширение для Chrome и 
 
 ### Установка
 
-**Из магазина.** Публикация в Chrome Web Store находится на проверке. После одобрения
-ссылка появится здесь и в [store/README.md](store/README.md). Edge Add-ons пока не
-опубликован.
+**Из магазина.** Публикация пока недоступна — используйте локальную сборку или
+enterprise-пакет.
 
 **Локальная сборка:**
 
@@ -170,7 +165,7 @@ Windows-учётной записи.
 - [x] Локальная анонимизация и восстановление для офисных, текстовых и структурированных файлов
 - [x] PDF redaction, ручной режим, vault с парольной фразой
 - [x] WASM-детекторы и ZIP-кодек
-- [ ] Chrome Web Store — проверка и публикация
+- [ ] Публикация в Chrome Web Store
 - [ ] Edge Add-ons
 - [ ] Safari Web Extension для macOS
 - [ ] Расширение покрытия реальными Word/LibreOffice/PDFium-сценариями
@@ -235,8 +230,6 @@ attribution — в [NOTICE](NOTICE).
 [ci-url]: https://github.com/OniVe/docs-masked-relay/actions/workflows/ci.yml
 [license-shield]: https://img.shields.io/github/license/OniVe/docs-masked-relay.svg?style=for-the-badge
 [license-url]: https://github.com/OniVe/docs-masked-relay/blob/main/LICENSE
-[cws-shield]: https://img.shields.io/badge/Chrome%20Web%20Store-pending%20review-yellow?style=for-the-badge
-[cws-url]: https://github.com/OniVe/docs-masked-relay/blob/main/store/SUBMISSION.md
 [mv3-shield]: https://img.shields.io/badge/Manifest-V3-blue?style=for-the-badge
 [mv3-url]: https://developer.chrome.com/docs/extensions/develop/migrate
 [ts-shield]: https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white
