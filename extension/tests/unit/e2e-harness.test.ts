@@ -505,6 +505,10 @@ describe('e2e harness runtime guards', () => {
   it('keeps one lock across fallback attempts', async () => {
     const dir = tempProfileRoot();
     process.env.DM_PLAYWRIGHT_USER_DATA_DIR = dir;
+    // Force a two-attempt chain (override, then Playwright default) below the
+    // cached-Chromium scan, so the fallback path runs on every OS even when CI
+    // has no cached Chromium and the default would be the only attempt.
+    process.env.DM_CHROMIUM_EXECUTABLE = path.join(dir, 'fake-chrome');
     const fallback = fakeContext();
     playwrightMock.launchPersistentContext
       .mockRejectedValueOnce(new Error('bundled Chromium failed'))
