@@ -1,179 +1,253 @@
-# DocsMasked Relay
+<!-- Improved compatibility of back to top link -->
+<a id="readme-top"></a>
 
-Локальная анонимизация персональных данных (PII) в файлах для ChatGPT. Расширение
-перехватывает загрузку файла, заменяет имена, телефоны, адреса, email и другие данные
-метками, а при скачивании возвращает исходные значения из зашифрованного локального
-хранилища. Сервера, аккаунта, телеметрии и рекламы нет.
+<!-- PROJECT SHIELDS -->
+[![CI][ci-shield]][ci-url]
+[![License][license-shield]][license-url]
+[![Chrome Web Store][cws-shield]][cws-url]
+[![Manifest V3][mv3-shield]][mv3-url]
+[![TypeScript][ts-shield]][ts-url]
 
-**Статус: 0.2.0.** Chrome/Edge, Manifest V3. Safari Web Extension — отдельный трек для
-macOS. Первая заявка в Chrome Web Store была отклонена из-за избыточных ключевых слов в
-описании; исправленная заявка отправлена повторно 2026-11-23 и **ожидает ревью**.
-Расширение пока не опубликовано, ссылка на магазин появится только после одобрения. В
-Microsoft Edge Add-ons заявка не отправлялась. Текущий Windows-установщик работает офлайн
-и всё равно требует ручного `Load unpacked`.
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+  <a href="https://github.com/OniVe/docs-masked-relay">
+    <img src="store/assets/icon-128.png" alt="DocsMasked Relay" width="80" height="80">
+  </a>
 
-## Что делает
+  <h3 align="center">DocsMasked Relay</h3>
 
-| Сценарий | Поведение |
-| --- | --- |
-| Загрузка файла в ChatGPT | Локально маскирует PII, отправляет только обезличенные байты и обезличенное имя |
-| Скачивание файла с метками | Возвращает исходные байты и имя из локального vault |
-| Скачивание без меток | Сохраняет файл без изменений |
-| Vault заблокирован | Загрузка отменяется (fail-closed), скачивание сохраняет файл как есть с предупреждением |
-| Перехват выключен | Файлы проходят без обработки; перезагрузка вкладки не нужна |
-| Ручной режим | «Анонимизировать» или «Восстановить» для выбранного файла в окне расширения |
+  <p align="center">
+    Локальная анонимизация персональных данных в файлах для ChatGPT.
+    <br />
+    Исходные значения и зашифрованное хранилище остаются на устройстве.
+    <br />
+    <br />
+    <a href="#о-проекте"><strong>О проекте</strong></a>
+    &middot;
+    <a href="#начало-работы"><strong>Начало работы</strong></a>
+    &middot;
+    <a href="https://github.com/OniVe/docs-masked-relay/issues">Сообщить об ошибке</a>
+    &middot;
+    <a href="https://github.com/OniVe/docs-masked-relay/issues">Предложить функцию</a>
+  </p>
+</div>
 
-Поддерживаемые форматы:
+<!-- STATUS -->
+> **Статус:** Chrome Web Store — исправленная заявка отправлена повторно и находится на проверке; расширение ещё не опубликовано, публичной ссылки пока нет — она появится после одобрения. Edge Add-ons не отправлен. Safari — отдельный macOS-трек. Текущая версия — `0.2.0`.
 
-- **DOCX, XLSX** — текст, колонтитулы, комментарии, скрытые части и метаданные.
-- **DOC, XLS** — старые форматы конвертируются в DOCX/XLSX; вёрстка, стили и макросы
-  теряются.
-- **TXT, Markdown** — с сохранением кодировки, BOM и переводов строк.
-- **JSON, JSONL, XML** — строки, ключи, текстовые узлы, CDATA и атрибуты; опасные
-  структуры отклоняются целиком.
-- **PDF** — необратимое удаление (redaction) в одну сторону; до 200 страниц, сканы без
-  текстового слоя блокируются.
-- **Изображения и встроенные объекты** внутри документов не сканируются.
+<!-- TABLE OF CONTENTS -->
+<details>
+  <summary>Содержание</summary>
+  <ol>
+    <li><a href="#о-проекте">О проекте</a></li>
+    <li><a href="#технологии">Технологии</a></li>
+    <li>
+      <a href="#начало-работы">Начало работы</a>
+      <ul>
+        <li><a href="#требования">Требования</a></li>
+        <li><a href="#установка">Установка</a></li>
+      </ul>
+    </li>
+    <li><a href="#использование">Использование</a></li>
+    <li><a href="#планы">Планы</a></li>
+    <li><a href="#участие">Участие</a></li>
+    <li><a href="#лицензия">Лицензия</a></li>
+    <li><a href="#контакты">Контакты</a></li>
+    <li><a href="#благодарности">Благодарности</a></li>
+  </ol>
+</details>
 
-Лимит файла по умолчанию — 25 МБ (настраивается до 100 МБ). LeakGuard повторно проверяет
-результат и блокирует отправку при остатках PII. Свои термины и список исключений
-настраиваются в параметрах.
+<!-- ABOUT THE PROJECT -->
+<a id="о-проекте"></a>
+## О проекте
 
-## Приватность
+[![DocsMasked Relay — настройки][product-screenshot]](https://github.com/OniVe/docs-masked-relay)
 
-- Всё обрабатывается локально в браузере. Нет сервера, учётной записи, аналитики,
-  телеметрии, рекламы, удалённой конфигурации и загружаемого кода.
-- Vault хранится в IndexedDB расширения и шифруется AES-GCM-256. Ключ устройства —
-  неэкспортируемый `CryptoKey`; дополнительная парольная фраза защищает master key через
-  PBKDF2-SHA256 (600 000 итераций). Content scripts не получают ключи и исходные значения.
-- В ChatGPT уходит только обезличенная копия файла и обезличенное имя. Исходные значения,
-  ключи и vault остаются на устройстве.
-- Метаданные документов очищаются всегда; отключить это нельзя.
-- «Свои термины» и «Список исключений» хранятся в настройках **в открытом виде** — не
-  вносите туда реальные PII.
-- Экспорт vault — только зашифрованный JSON с отдельной парольной фразой.
-- «Очистка данных» удаляет vault, ключи и настройки без возможности отмены.
+DocsMasked Relay — браузерное расширение для Chrome и Edge (Manifest V3). Оно помогает
+отправлять файлы в ChatGPT с меньшим риском для персональных данных: находит имена,
+телефоны, адреса, email и другие данные, заменяет их метками и отправляет только
+обезличенную копию. При скачивании файла с метками расширение возвращает исходные байты и
+имя из локального зашифрованного хранилища.
 
-Расширение не защищает от самого OpenAI: после отправки обезличенная копия хранится у
-OpenAI по их правилам. Это также не юридическая консультация и не гарантия соблюдения
-152-ФЗ.
+Всё работает в браузере: нет сервера, аккаунта, телеметрии, аналитики, рекламы и
+загружаемого кода. В ChatGPT уходит обезличенный файл; исходные значения, ключи и vault
+остаются на устройстве.
 
-### Ограничения
+Почему это полезно:
 
-- **PDF — в одну сторону.** После redaction исходный PDF восстановить нельзя.
-- **Нет OCR.** Сканы PDF без текстового слоя блокируются.
-- Автоматическое распознавание вероятностное: может пропустить данные или заменить
-  лишнее. LeakGuard снижает риск, но не устраняет его.
-- Некоторые структуры отклоняются целиком, если их нельзя обезличить безопасно: числовые
-  PII в JSON, XML с DOCTYPE/DTD или неизвестными сущностями, повреждённые архивы. Это
-  безопасный отказ, а не утечка.
-- Протокол chatgpt.com может измениться; запасной вариант — ручной режим.
-- Safari: автоматический перехват — desktop Safari 18+; iOS не поддерживается.
+* **Локальная обработка.** Файлы не отправляются на наш сервер — его просто нет.
+* **Восстановление.** Для поддерживаемых форматов можно вернуть исходный текст и имя файла.
+* **Ручной режим.** Работает без ChatGPT, если автоматический перехват недоступен.
+* **Свои правила.** Можно задать точные термины и метки для них.
+* **Открытый код.** MIT; сторонние компоненты перечислены в [NOTICE](NOTICE).
 
-## Установка
+Ограничения: PDF редактируется необратимо; сканы без текстового слоя блокируются; сложная
+вёрстка старых офисных файлов может потеряться; автоматические проверки вероятностны.
+Расширение не защищает от OpenAI и не заменяет юридическую консультацию.
 
-### Chrome Web Store / Edge Add-ons
+<p align="right">(<a href="#readme-top">наверх</a>)</p>
 
-Chrome Web Store: первая заявка отклонена из-за избыточных ключевых слов в описании,
-исправленная заявка отправлена повторно 2026-11-23 и ожидает рассмотрения; публичной
-ссылки пока нет, она появится здесь после одобрения и публикации. Microsoft Edge Add-ons:
-заявка не отправлялась. Не устанавливайте сборки расширения из непроверенных источников.
+<!-- BUILT WITH -->
+<a id="технологии"></a>
+## Технологии
 
-### Локальная сборка (Chrome / Edge)
+* [![TypeScript][ts-shield]][ts-url]
+* [![WXT][wxt-shield]][wxt-url]
+* [![Chrome MV3][mv3-shield]][mv3-url]
+* [![Rust WASM][rust-shield]][rust-url]
+* [![Bun][bun-shield]][bun-url]
+* [![Playwright][playwright-shield]][playwright-url]
 
-Требования: Bun 1.4+ и Node.js 24; Chrome или Edge stable.
+<p align="right">(<a href="#readme-top">наверх</a>)</p>
 
-```bash
-cd extension
+<!-- GETTING STARTED -->
+<a id="начало-работы"></a>
+## Начало работы
+
+### Требования
+
+* Chrome или Edge stable (Chromium MV3).
+* [Bun](https://bun.sh/) 1.4.2+ — для сборки и тестов.
+* Git.
+* Windows, macOS или Linux для разработки. Safari собирается только на macOS.
+
+### Установка
+
+**Из магазина.** Публикация в Chrome Web Store находится на проверке. После одобрения
+ссылка появится здесь и в [store/README.md](store/README.md). Edge Add-ons пока не
+опубликован.
+
+**Локальная сборка:**
+
+```sh
+git clone https://github.com/OniVe/docs-masked-relay.git
+cd docs-masked-relay/extension
 bun install --frozen-lockfile
 bun run build
 ```
 
-Затем откройте `chrome://extensions` (или `edge://extensions`), включите режим
-разработчика, нажмите **Load unpacked** и выберите `extension/.output/chrome-mv3`.
-Готовый zip для магазина: `bun run zip` →
-`extension/.output/docs-masked-relay-0.2.0-chrome.zip`.
+Затем в `chrome://extensions` или `edge://extensions` включите режим разработчика и
+загрузите папку `extension/.output/chrome-mv3` через **Load unpacked**.
 
-### Windows: установщик для одного пользователя
+**Проверки:**
 
-[`installer/`](installer/README.md) содержит офлайн-установщик без прав администратора.
-Он распаковывает расширение в `%LOCALAPPDATA%\DocsMaskedRelay`, создаёт ярлыки и
-проверяет manifest. Установщик не подписан, не скачивает ничего из сети и **не
-устанавливает расширение молча**: браузеры требуют включить режим разработчика и выбрать
-папку через **Load unpacked**. Политики Chrome/Edge установщик не обходит.
-
-### Enterprise: self-hosted CRX и политика
-
-Для управляемых Windows-машин есть отдельный путь: собственный HTTPS-хостинг подписанного
-CRX, `update.xml` и политика `ExtensionInstallForcelist`. Это требует прав администратора
-и не является потребительской установкой в один клик. Инструкция, ключи и ограничения —
-[`installer/enterprise/README.md`](installer/enterprise/README.md). Файл `key.pem` — секрет
-подписи; его нельзя коммитить или публиковать.
-
-### Safari (macOS)
-
-Safari-сборка и подпись выполняются только на macOS с Xcode. На Windows доступна
-статическая проверка `bun run build:safari`. Подробности —
-[`extension/docs/safari-build.md`](extension/docs/safari-build.md).
-
-## Разработка
-
-```bash
+```sh
 cd extension
-bun install --frozen-lockfile
-bun run test          # Vitest: 684 теста в 46 файлах
-bun run build         # Chrome MV3 → .output/chrome-mv3 (~15,8 МБ)
+bun run ci          # Biome + tsc + 684 unit-тестов
+bun run test:e2e    # Playwright, только fixed harness, один worker
 ```
 
-Полная проверка перед PR:
+E2E требует стабильный профиль браузера; не запускайте параллельные профили на одной
+Windows-учётной записи.
 
-```bash
-bun run ci            # Biome + tsc --noEmit + Vitest
-bun run build
-bun run zip
-```
+**Enterprise / self-hosted:** см. [installer/enterprise/README.md](installer/enterprise/README.md).
 
-`bun run ci` — канонический unit/check-прогон; CI в GitHub Actions запускает его, затем
-`build` и `zip` и публикует zip как artifact. E2E в CI не входит.
+<p align="right">(<a href="#readme-top">наверх</a>)</p>
 
-### E2E: фиксированный harness
+<!-- USAGE -->
+<a id="использование"></a>
+## Использование
 
-E2E запускается только через `bun run test:e2e` (Playwright + собранное расширение +
-mock chatgpt.com). Harness использует **один worker**, постоянный `userDataDir`, блокировку
-профиля и fail-not-skip. Не добавляйте `--workers=N`: параллельные Chromium-процессы
-против одного профиля недопустимы. В этом окружении e2e-прогон не выполнялся после
-статического исправления harness; на Windows пустой persistent-профиль ранее приводил к
-событиям 4625 и блокировке учётной записи. Подробности и правила —
-[`docs/planning/e2e-harness-fix.md`](docs/planning/e2e-harness-fix.md).
+1. Откройте окно расширения и убедитесь, что защита включена.
+2. Загрузите поддерживаемый файл в ChatGPT как обычно — расширение заменит данные метками.
+3. При скачивании файла из чата расширение восстановит исходные значения, если vault
+   разблокирован.
+4. Если автоматический перехват не сработал, используйте **Ручной режим**: выберите файл,
+   нажмите **Анонимизировать и скачать**, затем при необходимости **Восстановить и скачать**.
 
-## Скриншоты
+[![Ручной режим][popup-screenshot]](https://github.com/OniVe/docs-masked-relay)
 
-Все изображения — реальный интерфейс с синтетическими данными.
+Подробности: [extension/README.md](extension/README.md), [PRIVACY.md](extension/PRIVACY.md),
+[SECURITY.md](extension/SECURITY.md).
 
-| Окно расширения | Настройки |
-| --- | --- |
-| <img src="store/assets/screenshot-popup-1280x800.png" width="420" alt="Окно расширения DocsMasked Relay"> | <img src="store/assets/screenshot-options-1280x800.png" width="420" alt="Настройки DocsMasked Relay"> |
+<p align="right">(<a href="#readme-top">наверх</a>)</p>
 
-| Две колонки настроек | Свои правила |
-| --- | --- |
-| <img src="store/assets/screenshot-options-columns-1280x800.png" width="420" alt="Двухколоночные настройки"> | <img src="store/assets/screenshot-custom-rules-1280x800.png" width="420" alt="Свои термины и метки"> |
+<!-- ROADMAP -->
+<a id="планы"></a>
+## Планы
 
-## Документация
+- [x] Локальная анонимизация и восстановление для офисных, текстовых и структурированных файлов
+- [x] PDF redaction, ручной режим, vault с парольной фразой
+- [x] WASM-детекторы и ZIP-кодек
+- [ ] Chrome Web Store — проверка и публикация
+- [ ] Edge Add-ons
+- [ ] Safari Web Extension для macOS
+- [ ] Расширение покрытия реальными Word/LibreOffice/PDFium-сценариями
 
-- [Расширение: возможности, команды, устройство](extension/README.md)
-- [Политика конфиденциальности](extension/PRIVACY.md)
-- [Модель угроз и инварианты безопасности](extension/SECURITY.md)
-- [Спецификация](docs/planning/extension-spec.md)
-- [Release checklist](docs/planning/release-checklist.md)
-- [Store-prep: листинги, privacy page, чек-лист](store/README.md)
-- [Установщик для Windows](installer/README.md)
-- [Enterprise: self-hosted CRX](installer/enterprise/README.md)
-- [Safari build](extension/docs/safari-build.md)
-- [Исследование форматов и инструментов](research/README.md)
+Список задач и известных ограничений — в [issues](https://github.com/OniVe/docs-masked-relay/issues).
 
+<p align="right">(<a href="#readme-top">наверх</a>)</p>
+
+<!-- CONTRIBUTING -->
+<a id="участие"></a>
+## Участие
+
+Вклад приветствуется. Пожалуйста, не используйте реальные персональные данные в фикстурах,
+тестах, скриншотах и issue.
+
+1. Форкните репозиторий.
+2. Создайте ветку: `git checkout -b feature/AmazingFeature`.
+3. Внесите изменения и проверьте: `cd extension && bun run ci && bun run build`.
+4. Сделайте коммит и push.
+5. Откройте Pull Request.
+
+Подробные правила — в [CONTRIBUTING.md](CONTRIBUTING.md). Уязвимости — через GitHub
+private vulnerability reporting, см. [SECURITY.md](SECURITY.md).
+
+<p align="right">(<a href="#readme-top">наверх</a>)</p>
+
+<!-- LICENSE -->
+<a id="лицензия"></a>
 ## Лицензия
 
-Код проекта распространяется по лицензии MIT — см. [`LICENSE`](LICENSE). Сторонние
-компоненты, включая порт правил docs_masked, и их лицензии перечислены в
-[`NOTICE`](NOTICE). Код расширения также сопровождается
-[`extension/NOTICE`](extension/NOTICE).
+Распространяется под лицензией **MIT**. См. [LICENSE](LICENSE). Сторонние компоненты и
+attribution — в [NOTICE](NOTICE).
+
+<p align="right">(<a href="#readme-top">наверх</a>)</p>
+
+<!-- CONTACT -->
+<a id="контакты"></a>
+## Контакты
+
+* Issues: [github.com/OniVe/docs-masked-relay/issues](https://github.com/OniVe/docs-masked-relay/issues)
+* Security: GitHub private vulnerability reporting
+* Проект: [github.com/OniVe/docs-masked-relay](https://github.com/OniVe/docs-masked-relay)
+
+<p align="right">(<a href="#readme-top">наверх</a>)</p>
+
+<!-- ACKNOWLEDGMENTS -->
+<a id="благодарности"></a>
+## Благодарности
+
+* [docs_masked](https://github.com/kpshinnik/docs_masked) — MIT, идеи и правила PERSON/ORG/ADDRESS
+* [EmbedPDF](https://www.embedpdf.com/) / PDFium — PDF redaction
+* [SheetJS CE](https://sheetjs.com/) — legacy XLS
+* [WXT](https://wxt.dev/) — расширение и manifest
+* [fflate](https://github.com/101arrowz/fflate), [saxes](https://github.com/lddubeau/saxes), [docx](https://github.com/dolanmiu/docx)
+* [Shields.io](https://shields.io) — badges
+* [Best-README-Template](https://github.com/othneildrew/Best-README-Template) — структура README
+
+<p align="right">(<a href="#readme-top">наверх</a>)</p>
+
+<!-- MARKDOWN LINKS & IMAGES -->
+[ci-shield]: https://github.com/OniVe/docs-masked-relay/actions/workflows/ci.yml/badge.svg
+[ci-url]: https://github.com/OniVe/docs-masked-relay/actions/workflows/ci.yml
+[license-shield]: https://img.shields.io/github/license/OniVe/docs-masked-relay.svg?style=for-the-badge
+[license-url]: https://github.com/OniVe/docs-masked-relay/blob/main/LICENSE
+[cws-shield]: https://img.shields.io/badge/Chrome%20Web%20Store-pending%20review-yellow?style=for-the-badge
+[cws-url]: https://github.com/OniVe/docs-masked-relay/blob/main/store/SUBMISSION.md
+[mv3-shield]: https://img.shields.io/badge/Manifest-V3-blue?style=for-the-badge
+[mv3-url]: https://developer.chrome.com/docs/extensions/develop/migrate
+[ts-shield]: https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white
+[ts-url]: https://www.typescriptlang.org/
+[wxt-shield]: https://img.shields.io/badge/WXT-0.21-4B32C3?style=for-the-badge
+[wxt-url]: https://wxt.dev/
+[rust-shield]: https://img.shields.io/badge/Rust-WASM-000000?style=for-the-badge&logo=rust&logoColor=white
+[rust-url]: https://www.rust-lang.org/
+[bun-shield]: https://img.shields.io/badge/Bun-1.4.2-000000?style=for-the-badge&logo=bun&logoColor=white
+[bun-url]: https://bun.sh/
+[playwright-shield]: https://img.shields.io/badge/Playwright-tests-2EAD33?style=for-the-badge&logo=playwright&logoColor=white
+[playwright-url]: https://playwright.dev/
+[product-screenshot]: store/assets/screenshot-options-1280x800.png
+[popup-screenshot]: store/assets/screenshot-popup-1280x800.png
