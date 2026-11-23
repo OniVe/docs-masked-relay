@@ -226,7 +226,7 @@ attribution — в [NOTICE](NOTICE).
 <p align="right">(<a href="#readme-top">наверх</a>)</p>
 
 <!-- MARKDOWN LINKS & IMAGES -->
-[ci-shield]: https://github.com/OniVe/docs-masked-relay/actions/workflows/ci.yml/badge.svg
+[ci-shield]: https://img.shields.io/github/actions/workflow/status/OniVe/docs-masked-relay/ci.yml?branch=main&style=for-the-badge&label=CI&logo=githubactions&logoColor=white
 [ci-url]: https://github.com/OniVe/docs-masked-relay/actions/workflows/ci.yml
 [license-shield]: https://img.shields.io/github/license/OniVe/docs-masked-relay.svg?style=for-the-badge
 [license-url]: https://github.com/OniVe/docs-masked-relay/blob/main/LICENSE
