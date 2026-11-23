@@ -1,0 +1,10 @@
+# Build artifacts and IExpress intermediate files
+dist/
+staging/
+*.sed
+*.log
+
+# Self-hosted CRX distribution: generated package, private keys, signed CRXs
+enterprise/dist/
+enterprise/**/*.pem
+enterprise/**/*.crx

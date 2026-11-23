@@ -1,0 +1,476 @@
+:root {
+  color-scheme: light dark;
+  --bg: Canvas;
+  --fg: CanvasText;
+  --muted: GrayText;
+  --line: color-mix(in srgb, CanvasText 14%, transparent);
+  --line-strong: color-mix(in srgb, CanvasText 28%, transparent);
+  --surface: color-mix(in srgb, CanvasText 3%, Canvas);
+  --field: Field;
+  --field-text: FieldText;
+  --ok: #15803d;
+  --warn: #a16207;
+  --bad: #b91c1c;
+  --accent: #1d4ed8;
+  --accent-soft: color-mix(in srgb, #1d4ed8 10%, Canvas);
+  --accent-solid: #1d4ed8;
+  --accent-on: #ffffff;
+  --focus: #1d4ed8;
+  --radius: 10px;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 14px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ok: #4ade80;
+    --warn: #fbbf24;
+    --bad: #f87171;
+    --accent: #93c5fd;
+    --accent-soft: color-mix(in srgb, #93c5fd 14%, Canvas);
+    --accent-solid: #93c5fd;
+    --accent-on: #0b1220;
+    --focus: #93c5fd;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  width: 372px;
+  max-height: 600px;
+  margin: 0;
+  padding: 14px;
+  overflow-y: auto;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+h1 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+p {
+  margin: 0;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.version {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.stack {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.panel {
+  display: grid;
+  gap: 8px;
+  padding: 11px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.status-panel {
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--line));
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.panel-actions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.state {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, CanvasText 8%, transparent);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.state[data-kind="on"] {
+  background: color-mix(in srgb, var(--ok) 14%, Canvas);
+  color: var(--ok);
+}
+
+.state[data-kind="off"] {
+  background: color-mix(in srgb, var(--warn) 16%, Canvas);
+  color: var(--warn);
+}
+
+.state[data-kind="error"] {
+  background: color-mix(in srgb, var(--bad) 14%, Canvas);
+  color: var(--bad);
+}
+
+.state-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, CanvasText 10%, transparent);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.badge-label {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.badge-pair {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.badge[data-kind="unlocked"] {
+  background: color-mix(in srgb, var(--ok) 14%, Canvas);
+  color: var(--ok);
+}
+
+.badge[data-kind="locked"] {
+  background: color-mix(in srgb, var(--warn) 16%, Canvas);
+  color: var(--warn);
+}
+
+.badge[data-kind="error"] {
+  background: color-mix(in srgb, var(--bad) 14%, Canvas);
+  color: var(--bad);
+}
+
+.next-step {
+  padding: 7px 9px;
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  background: var(--accent-soft);
+  color: var(--fg);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 32px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.toggle-row input {
+  width: 17px;
+  height: 17px;
+  margin: 0;
+  accent-color: var(--accent-solid);
+  cursor: pointer;
+}
+
+button {
+  min-height: 32px;
+  padding: 7px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: ButtonFace;
+  color: ButtonText;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.unlock-form {
+  display: grid;
+  gap: 6px;
+  padding: 9px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 8px;
+}
+
+.unlock-form label,
+.file-label {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.unlock-form input {
+  width: 100%;
+  padding: 7px 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: var(--field);
+  color: var(--field-text);
+  font: inherit;
+}
+
+.unlock-form button {
+  border-color: transparent;
+  background: var(--accent-solid);
+  color: var(--accent-on);
+  font-weight: 600;
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.kv {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+code {
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: color-mix(in srgb, CanvasText 8%, transparent);
+  color: var(--fg);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+.vault-list {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vault-list li {
+  display: grid;
+  gap: 2px;
+  padding: 7px 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.vault-list .vault-prefix {
+  font-weight: 650;
+  letter-spacing: 0.02em;
+}
+
+.vault-list .muted {
+  color: var(--muted);
+}
+
+.manual-block {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 9px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.manual-block legend {
+  padding: 0 4px;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.manual-block button {
+  width: 100%;
+}
+
+input[type="file"] {
+  width: 100%;
+  min-width: 0;
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+}
+
+input[type="file"]::file-selector-button {
+  margin-right: 8px;
+  padding: 5px 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: ButtonFace;
+  color: ButtonText;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.status {
+  min-height: 1.2em;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.status:empty {
+  min-height: 0;
+}
+
+.status[data-kind="success"] {
+  color: var(--ok);
+}
+
+.status[data-kind="warning"] {
+  color: var(--warn);
+}
+
+.status[data-kind="error"] {
+  color: var(--bad);
+}
+
+.status[data-kind="success"]::before,
+.status[data-kind="warning"]::before,
+.status[data-kind="error"]::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  vertical-align: 0.08em;
+}
+
+.status:empty::before {
+  display: none;
+}
+
+button.secondary {
+  background: transparent;
+}
+
+button.small {
+  min-height: 28px;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+button:focus-visible,
+input:focus-visible,
+summary:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--focus) 55%, transparent);
+  outline-offset: 2px;
+}
+
+.disclosure {
+  border-top: 1px solid var(--line);
+  padding-top: 8px;
+}
+
+.disclosure summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+.disclosure summary:hover {
+  color: var(--fg);
+}
+
+.details-body {
+  display: grid;
+  gap: 8px;
+  padding-top: 8px;
+}
+
+.limits {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.last-action {
+  color: var(--muted);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none;
+    scroll-behavior: auto;
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .state-dot,
+  .status[data-kind]::before {
+    background: CanvasText;
+  }
+
+  button,
+  .unlock-form input,
+  input[type="file"]::file-selector-button {
+    border: 1px solid ButtonText;
+  }
+}
+
+/* Must stay last: class-level `display` rules above tie on specificity, so
+   this later rule keeps `hidden` elements truly hidden. */
+[hidden] {
+  display: none;
+}

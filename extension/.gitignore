@@ -1,0 +1,11 @@
+node_modules/
+.output/
+.wxt/
+wasm/*/target/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+*.log
+.DS_Store
+Thumbs.db

@@ -1,0 +1,44 @@
+{
+  "capturedAt": "2026-11-23T04:41:55.486Z",
+  "options": {
+    "columns": "590px 590px",
+    "parts": 2,
+    "width": 1280,
+    "height": 800
+  },
+  "optionsStatusLabel": "Статус:\n                Разблокирован",
+  "saveStatus": "Настройки сохранены. Изменения уже применяются.",
+  "customRules": {
+    "label": "CLIENT",
+    "term": "Иванов Иван => CLIENT"
+  },
+  "popupState": "Разблокирован",
+  "anonymize": {
+    "suggested": "smoke.txt",
+    "pii": [],
+    "tags": [
+      "[[0AS7X_CLIENT_1]]",
+      "[[0AS7X_EMAIL_1]]",
+      "[[0AS7X_PHONE_1]]"
+    ],
+    "patronymic": false
+  },
+  "restore": {
+    "suggested": "smoke.txt",
+    "pii": [
+      "Иванов Иван Иванович",
+      "ivan@example.ru",
+      "+7 916 123-45-67"
+    ],
+    "tags": 0,
+    "exact": true
+  },
+  "lock": {
+    "state": "Заблокирован",
+    "anonymizeDisabled": true,
+    "restoreDisabled": true,
+    "vaultMessage": "Хранилище заблокировано. Новые файлы не будут обрабатываться до разблокировки.",
+    "unlockDeviceVisible": true
+  },
+  "code": "b2e7244"
+}

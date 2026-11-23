@@ -1,0 +1,66 @@
+Third-party notices
+===================
+
+DocsMasked Relay includes third-party software, test fixtures and TypeScript ports of
+detection rules. This file aggregates the notices for components distributed with the
+project. The extension source also carries `extension/NOTICE`; keep both files in sync.
+
+docs_masked
+-----------
+
+This product includes TypeScript ports of PERSON, ORG and ADDRESS detection rules from
+docs_masked (https://github.com/kpshinnik/docs_masked), commit
+905f92362d574351c1f9b22f56685facffa42c54.
+
+MIT License
+
+Copyright (c) 2026 Kirill Pshinnik
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+Runtime dependencies
+--------------------
+
+- `@embedpdf/engine` 3.3.0 — Apache-2.0 (https://www.embedpdf.com/)
+- SheetJS CE (`xlsx`) 0.20.3 — Apache-2.0 (https://cdn.sheetjs.com/)
+- `pdf-lib` 1.17.1 — MIT (https://github.com/Hopding/pdf-lib)
+- `fflate` 0.8.3 — MIT (https://github.com/101arrowz/fflate)
+- `saxes` 6.0.0 — ISC (https://github.com/lddubeau/saxes)
+- `docx` 9.16.0 — MIT (https://github.com/dolanmiu/docx)
+- `word-extractor` 1.0.4 — MIT, Copyright (c) 2016-2021 Stuart Watt
+  (https://github.com/morungos/node-word-extractor)
+- `buffer` 6.0.3 — MIT (https://github.com/feross/buffer)
+- `jsonc-parser` 3.3.1 — MIT (https://github.com/microsoft/node-jsonc-parser)
+- `mdast-util-from-markdown`, `mdast-util-frontmatter`,
+  `micromark-extension-frontmatter`, `unist-util-visit` — MIT
+- `miniz_oxide` 0.8.9 — MIT (https://github.com/Frommi/miniz_oxide), compiled into
+  `extension/src/core/ooxml/codec.wasm`
+
+Test fixtures
+-------------
+
+The `.doc` fixtures in `extension/tests/fixtures/legacy/` come from the word-extractor test
+corpus; see `extension/tests/fixtures/legacy/ATTRIBUTION.md`.
+
+Development tooling
+-------------------
+
+Build and test tools (WXT, Biome, TypeScript, Vitest, Playwright, fake-indexeddb,
+pdfjs-dist) are used for development and are not part of the packaged extension unless
+explicitly bundled. They retain their own licenses and copyright notices.

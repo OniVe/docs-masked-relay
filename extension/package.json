@@ -1,0 +1,49 @@
+{
+  "name": "docs-masked-relay",
+  "description": "DocsMasked Relay — local PII anonymization for ChatGPT file uploads/downloads",
+  "private": true,
+  "version": "0.2.0",
+  "type": "module",
+  "scripts": {
+    "dev": "wxt -b chrome",
+    "build": "wxt build -b chrome",
+    "build:safari": "wxt build -b safari",
+    "build:wasm": "bun scripts/build-wasm.ts",
+    "lint": "biome lint .",
+    "format": "biome format --write .",
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
+    "ci": "biome ci . && tsc --noEmit && vitest run",
+    "test": "vitest run",
+    "test:e2e": "wxt build -b chrome && playwright test --workers=1",
+    "typecheck": "tsc --noEmit",
+    "zip": "wxt zip -b chrome",
+    "icons": "bun scripts/make-icons.ts",
+    "postinstall": "wxt prepare"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.6.8",
+    "@playwright/test": "^1.65.1",
+    "@types/node": "^26.6.6",
+    "fake-indexeddb": "^6.2.8",
+    "pdfjs-dist": "^6.5.438",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.1",
+    "wxt": "^0.21.5"
+  },
+  "dependencies": {
+    "@embedpdf/engine": "3.3.0",
+    "buffer": "^6.0.3",
+    "docx": "^9.16.0",
+    "fflate": "^0.8.3",
+    "jsonc-parser": "^3.3.1",
+    "mdast-util-from-markdown": "^2.1.0",
+    "mdast-util-frontmatter": "^2.0.1",
+    "micromark-extension-frontmatter": "^2.0.0",
+    "pdf-lib": "^1.17.1",
+    "saxes": "^6.0.0",
+    "unist-util-visit": "^5.2.0",
+    "word-extractor": "^1.0.4",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
+  }
+}

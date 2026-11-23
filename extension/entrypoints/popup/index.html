@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DocsMasked Relay</title>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <h1>DocsMasked Relay</h1>
+        <span id="version" class="version"></span>
+      </div>
+      <button id="options-button" class="secondary small" type="button">Настройки</button>
+    </header>
+
+    <main class="stack">
+      <section class="panel status-panel" aria-labelledby="protection-title">
+        <div class="panel-head">
+          <h2 id="protection-title">Защита</h2>
+          <span id="protection-state" class="state" data-kind="idle">
+            <span id="protection-dot" class="state-dot" aria-hidden="true"></span>
+            <span id="protection-state-text">Проверка…</span>
+          </span>
+        </div>
+        <p id="protection-message" class="status" role="status" aria-live="polite" aria-atomic="true">
+          Проверяем настройки…
+        </p>
+        <p id="next-step" class="next-step">Загружаем состояние защиты.</p>
+        <label class="toggle-row" for="enabled-toggle">
+          <input id="enabled-toggle" type="checkbox" />
+          <span>Перехватывать файлы в ChatGPT</span>
+        </label>
+      </section>
+
+      <section class="panel" aria-labelledby="vault-title">
+        <div class="panel-head">
+          <h2 id="vault-title">Хранилище</h2>
+          <span class="badge-pair">
+            <span class="badge-label">Статус:</span>
+            <span id="vault-state" class="badge" role="status" aria-live="polite">…</span>
+          </span>
+        </div>
+        <p id="vault-summary" class="hint">Проверяем состояние хранилища…</p>
+
+        <form id="unlock-form" class="unlock-form" hidden>
+          <label for="unlock-passphrase">Парольная фраза</label>
+          <input
+            id="unlock-passphrase"
+            type="password"
+            autocomplete="current-password"
+            maxlength="1024"
+            aria-describedby="unlock-hint vault-message"
+          />
+          <button id="unlock-button" type="submit">Разблокировать хранилище</button>
+        </form>
+        <p id="unlock-hint" class="hint" hidden>
+          Парольная фраза не хранится. Без неё доступ к маппингу восстановить нельзя. Введённый
+          текст остаётся в поле при ошибке.
+        </p>
+        <button id="unlock-device-button" class="secondary" type="button" hidden>
+          Разблокировать ключом устройства
+        </button>
+        <p id="vault-message" class="status" role="status" aria-live="polite" aria-atomic="true"></p>
+
+        <div class="panel-actions">
+          <button id="lock-button" class="secondary" type="button" hidden>
+            Заблокировать хранилище
+          </button>
+        </div>
+
+        <details class="disclosure">
+          <summary>Хранилища и текущий чат</summary>
+          <div class="details-body">
+            <p class="kv">
+              Текущий чат: <code id="current-chat">—</code><br />
+              Код хранилища: <code id="current-prefix">—</code>
+            </p>
+            <ul id="vault-list" class="vault-list"></ul>
+            <p id="vault-empty" class="hint" hidden>
+              Хранилище пока не создано. Оно создастся при первой анонимизации файла.
+            </p>
+          </div>
+        </details>
+      </section>
+
+      <section id="manual-panel" class="panel" aria-labelledby="manual-title">
+        <h2 id="manual-title">Ручной режим</h2>
+        <p id="manual-hint" class="hint">
+          Если автоматический перехват не сработал, обработайте файл вручную.
+        </p>
+
+        <fieldset class="manual-block">
+          <legend>Анонимизировать файл</legend>
+          <label class="file-label" for="anonymize-file">Файл для анонимизации</label>
+          <input id="anonymize-file" type="file" aria-describedby="manual-hint" />
+          <button id="anonymize-button" type="button">Анонимизировать и скачать</button>
+        </fieldset>
+
+        <fieldset class="manual-block">
+          <legend>Восстановить файл</legend>
+          <label class="file-label" for="restore-file">Файл с тегами</label>
+          <input id="restore-file" type="file" aria-describedby="manual-hint" />
+          <button id="restore-button" type="button">Восстановить и скачать</button>
+          <p class="hint">PDF не восстанавливается: redaction необратим.</p>
+        </fieldset>
+
+        <p
+          id="manual-status"
+          class="status"
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        ></p>
+      </section>
+
+      <p class="last-action">
+        Последнее действие: <span id="last-action">—</span>
+      </p>
+
+      <details class="disclosure">
+        <summary>Ограничения и приватность</summary>
+        <div class="details-body">
+          <ul class="limits">
+            <li>DOCX, XLSX, TXT, MD, JSON, XML и PDF обрабатываются на этом устройстве.</li>
+            <li>PDF: redaction необратим; восстановить PDF нельзя.</li>
+            <li>Сканы PDF без текстового слоя блокируются: OCR нет.</li>
+            <li>Legacy .doc/.xls конвертируются в .docx/.xlsx с потерей вёрстки.</li>
+            <li>Изображения и встроенные объекты не сканируются.</li>
+            <li>
+              Исходные персональные данные остаются на устройстве. В ChatGPT уходит обезличенная
+              копия с тегами; хранилище и парольная фраза не отправляются.
+            </li>
+          </ul>
+        </div>
+      </details>
+    </main>
+
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

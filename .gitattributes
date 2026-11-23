@@ -1,0 +1,13 @@
+# Normalize text files to LF on checkout/commit so Biome (lineEnding: lf)
+# passes on Windows clones with core.autocrlf=true.
+* text=auto eol=lf
+
+# Real binary fixtures must never be line-ending converted.
+*.png binary
+*.doc binary
+*.xls binary
+*.wasm binary
+*.docx binary
+*.xlsx binary
+*.pdf binary
+*.zip binary

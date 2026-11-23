@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Open options as a full tab: the embedded options dialog is narrower than
+         the 1024 px two-column breakpoint. -->
+    <meta name="manifest.open_in_tab" content="true" />
+    <title>DocsMasked Relay — настройки</title>
+  </head>
+  <body>
+    <main class="page">
+      <header class="page-header">
+        <div class="header-copy">
+          <h1>Настройки DocsMasked Relay</h1>
+          <p class="subtitle">
+            Персональные данные заменяются тегами на этом устройстве. В ChatGPT уходит
+            обезличенная копия; исходные значения и хранилище остаются локально.
+          </p>
+        </div>
+        <div class="header-actions">
+          <span id="version" class="version"></span>
+          <button id="lock-now" class="secondary small" type="button" hidden>
+            Заблокировать хранилище
+          </button>
+        </div>
+      </header>
+
+      <div class="save-bar">
+        <button id="save-button" class="primary" type="button">Сохранить настройки</button>
+        <span id="save-status" class="status save-status" role="status" aria-live="polite" aria-atomic="true"></span>
+      </div>
+
+      <section class="card summary-card" aria-labelledby="summary-title">
+        <div class="card-head">
+          <h2 id="summary-title">Состояние</h2>
+          <span class="eyebrow">Сейчас</span>
+        </div>
+        <ul class="summary-list">
+          <li>
+            <span class="summary-label">Защита</span>
+            <span id="summary-protection" class="pill" data-kind="loading">Загрузка…</span>
+          </li>
+          <li>
+            <span class="summary-label">Статус хранилища</span>
+            <span id="summary-vault" class="pill" data-kind="loading">Загрузка…</span>
+          </li>
+          <li>
+            <span class="summary-label">Хранилища</span>
+            <span id="summary-vaults" class="pill" data-kind="loading">Загрузка…</span>
+          </li>
+        </ul>
+        <p id="summary-next" class="summary-next" role="status" aria-live="polite">
+          Загружаем состояние…
+        </p>
+      </section>
+
+      <section id="onboarding" class="card onboarding" hidden aria-labelledby="onboarding-title">
+        <div class="card-head">
+          <h2 id="onboarding-title">Как это работает</h2>
+          <span class="eyebrow">Первый запуск</span>
+        </div>
+        <p>
+          Вы отправляете файл в ChatGPT как обычно. Расширение заменяет имена, телефоны, адреса
+          и другие персональные данные тегами, очищает метаданные и загружает уже обезличенную
+          копию. Скачанные файлы оно восстанавливает, пока хранилище доступно.
+        </p>
+
+        <div class="onboarding-grid">
+          <div class="onboarding-block">
+            <h3>Остаётся на устройстве</h3>
+            <ul>
+              <li>Исходные значения персональных данных.</li>
+              <li>Маппинг тегов в зашифрованном хранилище.</li>
+              <li>Парольная фраза: она не хранится и не отправляется.</li>
+            </ul>
+          </div>
+          <div class="onboarding-block">
+            <h3>Уходит в ChatGPT</h3>
+            <ul>
+              <li>Обезличенная копия файла с тегами.</li>
+              <li>Имя файла после маскировки и служебные метаданные загрузки.</li>
+              <li>Ничего из хранилища и никакой телеметрии.</li>
+            </ul>
+          </div>
+        </div>
+
+        <details class="disclosure">
+          <summary>Ограничения, о которых лучше знать сразу</summary>
+          <div class="details-body">
+            <ul class="limits">
+              <li>PDF: redaction необратим, восстановить PDF нельзя.</li>
+              <li>Сканы PDF без текстового слоя блокируются: OCR нет.</li>
+              <li>Legacy .doc/.xls конвертируются в .docx/.xlsx с потерей вёрстки.</li>
+              <li>Изображения и встроенные объекты внутри документов не сканируются.</li>
+              <li>
+                Очистка метаданных покрывает поддерживаемые адаптеры, но не все возможные
+                контейнеры и вложения.
+              </li>
+              <li>Это не защита от самого OpenAI и не юридическая консультация.</li>
+            </ul>
+          </div>
+        </details>
+
+        <p class="muted permissions">
+          Разрешения: <code>storage</code> и <code>unlimitedStorage</code> для настроек и хранилища;
+          <code>offscreen</code> для PDF в Chrome, <code>scripting</code> для MAIN-world в Safari.
+          Host-доступ только к chatgpt.com и *.oaiusercontent.com. Телеметрии и внешних API нет.
+        </p>
+        <div class="onboarding-actions">
+          <button id="onboarding-dismiss" type="button">Пропустить знакомство</button>
+          <span class="hint">Настройки доступны сразу; эти сведения остаются ниже.</span>
+        </div>
+      </section>
+
+      <div class="settings-columns">
+        <div class="settings-column settings-column-main">
+          <section class="card" aria-labelledby="protection-title">
+            <h2 id="protection-title">Защита</h2>
+            <label class="switch-row">
+              <input id="enabled" type="checkbox" aria-describedby="enabled-hint" />
+              <span>
+                <strong>Перехватывать файлы в ChatGPT</strong>
+                <span id="enabled-hint" class="hint">
+                  Выключение останавливает перехват сразу, без перезагрузки вкладки. Ручной режим в
+                  popup тоже перестаёт работать.
+                </span>
+              </span>
+            </label>
+
+            <fieldset class="field-grid">
+              <legend>Лимиты и автоматика</legend>
+              <label class="field">
+                <span>Лимит файла, МБ</span>
+                <input
+                  id="max-bytes"
+                  type="number"
+                  min="1"
+                  max="100"
+                  step="1"
+                  aria-describedby="max-bytes-hint save-status"
+                />
+                <span id="max-bytes-hint" class="hint">От 1 до 100 МБ. Больше — файл не обработается.</span>
+              </label>
+              <label class="field">
+                <span>Автоблокировка хранилища, минут</span>
+                <input
+                  id="vault-lock-minutes"
+                  type="number"
+                  min="1"
+                  max="240"
+                  step="1"
+                  aria-describedby="lock-minutes-hint save-status"
+                />
+                <span id="lock-minutes-hint" class="hint">
+                  От 1 до 240 минут. После таймаута хранилище закрывается.
+                </span>
+              </label>
+            </fieldset>
+
+            <label class="switch-row">
+              <input id="mask-filenames" type="checkbox" aria-describedby="mask-filenames-hint" />
+              <span>
+                <strong>Маскировать имена файлов</strong>
+                <span id="mask-filenames-hint" class="hint">
+                  Имя файла тоже может содержать персональные данные. Отключение оставит имя как есть.
+                </span>
+              </span>
+            </label>
+            <label class="switch-row">
+              <input id="strip-metadata" type="checkbox" checked disabled aria-describedby="strip-hint" />
+              <span>
+                <strong>Очищать метаданные</strong>
+                <span id="strip-hint" class="hint">
+                  Всегда включено: формат-адаптеры не сохраняют метаданные.
+                </span>
+              </span>
+            </label>
+          </section>
+
+          <details class="card disclosure-card" aria-labelledby="detection-title" open>
+            <summary>
+              <h2 id="detection-title">Категории персональных данных</h2>
+              <span id="labels-summary" class="hint">Загрузка…</span>
+            </summary>
+            <div class="details-body">
+              <p class="muted">
+                Снятые категории не маскируются. Если снять все, LeakGuard заблокирует отправку
+                файлов с найденными персональными данными.
+              </p>
+              <p id="labels-legend" class="field-legend">Категории</p>
+              <fieldset id="labels" class="label-grid" aria-labelledby="labels-legend"></fieldset>
+
+              <fieldset class="field-grid">
+                <legend>Способы поиска</legend>
+                <label class="switch-row">
+                  <input id="aggressive" type="checkbox" aria-describedby="aggressive-hint" />
+                  <span>
+                    <strong>Агрессивный режим</strong>
+                    <span id="aggressive-hint" class="hint">
+                      Больше совпадений, выше риск ложных срабатываний.
+                    </span>
+                  </span>
+                </label>
+                <label class="switch-row">
+                  <input id="enable-date" type="checkbox" />
+                  <span>Даты</span>
+                </label>
+                <label class="switch-row">
+                  <input id="enable-url" type="checkbox" />
+                  <span>URL</span>
+                </label>
+                <label class="switch-row">
+                  <input id="skip-code" type="checkbox" />
+                  <span>Не обрабатывать код в Markdown</span>
+                </label>
+                <label class="switch-row">
+                  <input id="block-on-leak" type="checkbox" aria-describedby="leak-hint" />
+                  <span>
+                    <strong>Блокировать отправку при остатке персональных данных</strong>
+                    <span id="leak-hint" class="hint">
+                      LeakGuard останавливает загрузку, если в файле остались данные, похожие на персональные.
+                    </span>
+                  </span>
+                </label>
+              </fieldset>
+            </div>
+          </details>
+
+          <details class="card disclosure-card" aria-labelledby="terms-title" open>
+            <summary>
+              <h2 id="terms-title">Свои правила</h2>
+              <span class="hint">Термины и allowlist</span>
+            </summary>
+            <div class="details-body">
+              <label class="field">
+                <span>Метка замены</span>
+                <input
+                  id="custom-label"
+                  type="text"
+                  maxlength="32"
+                  placeholder="CUSTOM"
+                  spellcheck="false"
+                  autocomplete="off"
+                  aria-describedby="custom-label-hint custom-label-error"
+                />
+                <span id="custom-label-hint" class="hint">
+                  Используется внутри тега: <code>[[AB12C_CLIENT_1]]</code>. Только заглавные
+                  латинские буквы и цифры, первый символ — буква, до 32 символов. Пример:
+                  <code>CLIENT</code>. Метка используется внутри тега; произвольный текст не
+                  подходит, иначе файл нельзя восстановить.
+                </span>
+                <span id="custom-label-error" class="status" data-kind="error" role="alert"></span>
+              </label>
+              <label class="field">
+                <span>Дополнительные термины — по одному на строку</span>
+                <textarea
+                  id="custom-terms"
+                  rows="5"
+                  spellcheck="false"
+                  aria-describedby="custom-terms-hint custom-terms-error"
+                  placeholder="Иванов Иван => CLIENT&#10;Проект «Альфа» => PROJECT&#10;договор № 42 => DOC&#10;секрет"
+                ></textarea>
+                <span id="custom-terms-hint" class="hint">
+                  Строка без метки использует «Метку замены». Свою метку можно задать через
+                  <code>=&gt;</code> или <code>-&gt;</code>: <code>термин =&gt; МЕТКА</code>. Стрелка
+                  внутри термина не поддерживается: термин заканчивается на первой стрелке. До 500
+                  строк. Если метка в строке не подходит, для неё используется
+                  <code>CUSTOM</code>.
+                </span>
+                <span id="custom-terms-error" class="status" data-kind="warning" role="status"></span>
+              </label>
+              <details class="custom-examples">
+                <summary>Примеры</summary>
+                <div class="details-body">
+                  <p>Строки в списке и результат в файле:</p>
+                  <ul>
+                    <li>
+                      <code>Иванов Иван =&gt; CLIENT</code> → <code>[[AB12C_CLIENT_1]]</code>.
+                      Повторное упоминание получает тот же тег.
+                    </li>
+                    <li>
+                      <code>Петров Пётр =&gt; CLIENT</code> → <code>[[AB12C_CLIENT_2]]</code>:
+                      счётчик свой у каждой метки.
+                    </li>
+                    <li>
+                      <code>Проект «Альфа» =&gt; PROJECT</code> →
+                      <code>[[AB12C_PROJECT_1]]</code>
+                    </li>
+                    <li>
+                      <code>договор № 42 =&gt; DOC</code> →
+                      <code>[[AB12C_DOC_1]]</code>
+                    </li>
+                    <li>
+                      <code>секрет</code> (без стрелки, при метке <code>CLIENT</code>) →
+                      <code>[[AB12C_CLIENT_3]]</code>, если два CLIENT-термина уже заняли 1 и 2.
+                    </li>
+                  </ul>
+                  <p>
+                    Номер в теге зависит от порядка появления термина в файле.
+                    <strong>Метка используется внутри тега; произвольный текст не подходит, иначе
+                    файл нельзя восстановить.</strong>
+                  </p>
+                </div>
+              </details>
+              <label class="field">
+                <span>Allowlist — по одному на строку (не маскировать)</span>
+                <textarea
+                  id="allowlist"
+                  rows="4"
+                  spellcheck="false"
+                  aria-describedby="allowlist-hint"
+                  placeholder="ООО «Ромашка»&#10;support@example.ru"
+                ></textarea>
+                <span id="allowlist-hint" class="hint">
+                  Эти слова останутся в файле. Например, публичное название компании или адрес
+                  поддержки. Совпадение точное, без учёта регистра. До 500 строк.
+                </span>
+              </label>
+              <p class="warning-note">
+                Списки хранятся локально и никуда не отправляются. <strong>Но они не входят в
+                шифрованное хранилище:</strong> настройки лежат в открытом виде. Не вносите сюда
+                реальные имена и другие персональные данные.
+              </p>
+            </div>
+          </details>
+        </div>
+
+        <div class="settings-column settings-column-side">
+          <section class="card" aria-labelledby="security-title">
+            <div class="card-head">
+              <h2 id="security-title">Парольная фраза и блокировка</h2>
+              <span class="badge-pair">
+                <span class="hint">Статус:</span>
+                <span id="vault-state" class="badge" role="status" aria-live="polite">…</span>
+              </span>
+            </div>
+            <p id="vault-mode" class="muted">Проверяем состояние хранилища…</p>
+            <p class="muted">
+              Ключ устройства открывает хранилище автоматически после перезапуска браузера.
+              Парольная фраза закрывает хранилище после перезапуска и по таймауту — её придётся
+              вводить снова.
+            </p>
+            <p id="passphrase-loss" class="warning-note">
+              Парольная фраза не хранится и не восстанавливается. Потеря фразы = потеря доступа к
+              маппингу хранилища: скачанные файлы с тегами больше нельзя будет восстановить.
+            </p>
+
+            <form id="options-unlock-form" class="inline-form" hidden>
+              <label class="field grow">
+                <span>Парольная фраза для разблокировки</span>
+                <input
+                  id="options-unlock-passphrase"
+                  type="password"
+                  autocomplete="current-password"
+                  aria-describedby="passphrase-loss security-message"
+                />
+              </label>
+              <button id="options-unlock-button" class="primary" type="submit">Разблокировать хранилище</button>
+            </form>
+            <button id="options-unlock-device" class="secondary" type="button" hidden>
+              Разблокировать ключом устройства
+            </button>
+
+            <fieldset id="passphrase-enable-form" class="stack" hidden>
+              <legend class="field-legend">Включить парольную фразу</legend>
+              <label class="field">
+                <span>Новая парольная фраза</span>
+                <input
+                  id="passphrase-new"
+                  type="password"
+                  autocomplete="new-password"
+                  aria-describedby="passphrase-loss security-message"
+                />
+              </label>
+              <label class="field">
+                <span>Повторите парольную фразу</span>
+                <input
+                  id="passphrase-new-confirm"
+                  type="password"
+                  autocomplete="new-password"
+                  aria-describedby="passphrase-loss security-message"
+                />
+              </label>
+              <button id="passphrase-enable-button" class="primary" type="button">
+                Включить парольную фразу
+              </button>
+            </fieldset>
+
+            <fieldset id="passphrase-change-form" class="stack" hidden>
+              <legend class="field-legend">Сменить парольную фразу</legend>
+              <label class="field">
+                <span>Текущая парольная фраза</span>
+                <input
+                  id="passphrase-current"
+                  type="password"
+                  autocomplete="current-password"
+                  aria-describedby="passphrase-loss security-message"
+                />
+              </label>
+              <label class="field">
+                <span>Новая парольная фраза</span>
+                <input
+                  id="passphrase-next"
+                  type="password"
+                  autocomplete="new-password"
+                  aria-describedby="passphrase-loss security-message"
+                />
+              </label>
+              <button id="passphrase-change-button" type="button">Сменить парольную фразу</button>
+            </fieldset>
+
+            <fieldset id="passphrase-remove-form" class="stack" hidden>
+              <legend class="field-legend">Снять парольную фразу</legend>
+              <p class="hint">
+                Хранилище не удаляется: оно начнёт открываться ключом устройства. Восстановление
+                файлов останется доступным после перезапуска браузера.
+              </p>
+              <label class="field">
+                <span>Текущая парольная фраза</span>
+                <input
+                  id="passphrase-remove-current"
+                  type="password"
+                  autocomplete="current-password"
+                  aria-describedby="passphrase-loss security-message"
+                />
+              </label>
+              <button id="passphrase-remove-button" class="secondary" type="button">
+                Снять парольную фразу
+              </button>
+            </fieldset>
+
+            <p
+              id="security-message"
+              class="status"
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
+            ></p>
+          </section>
+
+          <section class="card" aria-labelledby="vault-title">
+            <div class="card-head">
+              <h2 id="vault-title" tabindex="-1">Хранилища</h2>
+              <span id="vault-count" class="hint">Загрузка…</span>
+            </div>
+            <p class="muted">
+              Хранилище содержит зашифрованный маппинг тегов. Исходные файлы в нём не
+              сохраняются.
+            </p>
+            <ul id="vault-list" class="vault-list"></ul>
+            <p id="vault-empty" class="empty-state" hidden>
+              <strong>Хранилище пока не создано.</strong> Оно создастся автоматически, когда вы
+              впервые анонимизируете файл. Откройте popup расширения и выберите файл в ручном
+              режиме — после этого здесь появятся код хранилища и число чатов.
+            </p>
+
+            <details class="disclosure" open>
+              <summary>Резервная копия: экспорт и импорт</summary>
+              <div class="details-body">
+                <p class="muted">
+                  Экспорт скачивает только зашифрованный JSON. Пароль для экспорта — отдельный; без
+                  него backup не восстановить. Запишите его до скачивания.
+                </p>
+                <div class="inline-form">
+                  <label class="field grow">
+                    <span>Пароль для экспорта</span>
+                    <input
+                      id="export-passphrase"
+                      type="password"
+                      autocomplete="new-password"
+                      aria-describedby="export-hint export-message"
+                    />
+                    <span id="export-hint" class="hint">Этот пароль не сохраняется.</span>
+                  </label>
+                  <button id="export-button" type="button">Экспортировать backup</button>
+                </div>
+                <p
+                  id="export-message"
+                  class="status"
+                  role="status"
+                  aria-live="polite"
+                  aria-atomic="true"
+                ></p>
+
+                <p class="muted">
+                  Импорт добавляет хранилище из зашифрованного backup. Совпадающие id/код
+                  хранилища отклоняются целиком: существующие данные не изменяются.
+                </p>
+                <label class="field">
+                  <span>Файл backup (.json)</span>
+                  <input id="import-file" type="file" accept="application/json,.json" />
+                </label>
+                <div class="inline-form">
+                  <label class="field grow">
+                    <span>Пароль от backup</span>
+                    <input
+                      id="import-passphrase"
+                      type="password"
+                      autocomplete="new-password"
+                      aria-describedby="import-hint import-message"
+                    />
+                    <span id="import-hint" class="hint">Тот пароль, который задали при экспорте.</span>
+                  </label>
+                  <button id="import-button" type="button">Импортировать backup</button>
+                </div>
+                <p
+                  id="import-message"
+                  class="status"
+                  role="status"
+                  aria-live="polite"
+                  aria-atomic="true"
+                ></p>
+              </div>
+            </details>
+          </section>
+
+          <section class="card danger-card" aria-labelledby="data-title">
+            <h2 id="data-title" tabindex="-1">Удалить все данные</h2>
+            <p class="muted">
+              Удаляет все хранилища, ключи шифрования и настройки. Восстановить их без backup нельзя.
+            </p>
+            <p id="clear-data-hint" class="hint">
+              Если старые файлы с тегами ещё могут понадобиться, сначала сделайте backup в разделе
+              «Хранилища».
+            </p>
+            <button
+              id="clear-data-button"
+              class="danger"
+              type="button"
+              aria-describedby="clear-data-hint"
+            >
+              Удалить все данные
+            </button>
+
+            <section
+              id="clear-data-panel"
+              class="confirm-panel"
+              aria-labelledby="clear-data-title"
+              aria-describedby="clear-data-desc"
+              hidden
+            >
+              <h3 id="clear-data-title">Удалить все данные?</h3>
+              <p id="clear-data-desc">
+                Будут удалены все хранилища, ключи шифрования и настройки. Вернуть их без backup нельзя.
+                Это действие необратимо.
+              </p>
+              <div class="confirm-actions">
+                <button id="clear-data-cancel" class="secondary" type="button">Оставить данные</button>
+                <button id="clear-data-confirm" class="danger" type="button" aria-describedby="clear-data-desc data-message">
+                  Удалить все данные
+                </button>
+              </div>
+            </section>
+
+            <p id="data-message" class="status" role="status" aria-live="polite" aria-atomic="true"></p>
+          </section>
+
+          <details class="card disclosure-card" aria-labelledby="limits-title">
+            <summary>
+              <h2 id="limits-title">Ограничения и приватность</h2>
+              <span class="hint">Что расширение не делает</span>
+            </summary>
+            <div class="details-body">
+              <ul class="limits">
+                <li>Поддержаны DOCX, XLSX, TXT, MD, JSON, JSONL, XML и PDF. Остальные форматы отклоняются.</li>
+                <li>PDF: redaction необратим; восстановить PDF нельзя. Сканы без текстового слоя блокируются, OCR нет.</li>
+                <li>Legacy .doc/.xls конвертируются в .docx/.xlsx; вёрстка, стили и часть объектов теряются.</li>
+                <li>Изображения, embedded OLE и некоторые вложения не сканируются и не маскируются.</li>
+                <li>Метаданные очищаются в поддерживаемых адаптерах; экзотические контейнеры не гарантированы.</li>
+                <li>Расширение не защищает от самого OpenAI, компрометации ОС или других расширений.</li>
+                <li>Это не юридическая консультация: перед отправкой чувствительных документов проверьте требования.</li>
+              </ul>
+            </div>
+          </details>
+        </div>
+      </div>
+    </main>
+
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

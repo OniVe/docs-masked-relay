@@ -1,0 +1,32 @@
+# Dependencies and build output
+node_modules/
+.output/
+.wxt/
+dist/
+staging/
+wasm/*/target/
+
+# Tests and reports
+reports/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# Internal/process artifacts
+state.md
+handoff-*
+audit-*
+
+# Logs
+*.log
+
+# Secrets and signed packages
+*.pem
+*.crx
+store/packages/*.zip
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini

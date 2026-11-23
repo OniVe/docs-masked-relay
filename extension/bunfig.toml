@@ -1,0 +1,4 @@
+# Bare `bun test` uses Bun's built-in runner; keep Playwright specs out of it.
+# The canonical unit test command is `bun run test` (Vitest).
+[test]
+pathIgnorePatterns = ["tests/e2e/**"]
