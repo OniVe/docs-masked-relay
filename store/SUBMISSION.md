@@ -1,8 +1,23 @@
 # Store submission checklist — Chrome Web Store / Microsoft Edge Add-ons
 
-Version 0.2.0. Prepared, **not submitted**. Uploading, publishing a privacy-policy URL,
-and clicking Publish are external actions of the project owner. Ship/publication is out of
-scope for the release-prep task.
+Version 0.2.0. Chrome Web Store submission sent 2026-11-23 and is pending review;
+Microsoft Edge Add-ons was not submitted. See the status section below. The checklist
+documents the preparation and remaining external actions of the project owner.
+
+## Submission status (2026-11-23)
+
+- **Chrome Web Store**: submission sent on 2026-11-23 via Yandex Browser (Chromium MV3).
+  Status: «Ожидает рассмотрения» (pending review). Item ID:
+  `iieopopifchankeeciiekichbcfdbdnl`.
+  Auto-publish after approval: enabled. The extension is **not published yet**; the public
+  listing URL will be added to this repository only after approval.
+- **Privacy policy URL**:
+  `https://onive.github.io/docs-masked-relay/store/privacy-policy.html`.
+- **Support URL**: `https://github.com/OniVe/docs-masked-relay/issues`.
+- **Microsoft Edge Add-ons**: not submitted.
+
+The checklist below is kept as preparation and instruction material. Nothing is marked
+done unless it was actually verified.
 
 ## 0. Build and verify the package
 
