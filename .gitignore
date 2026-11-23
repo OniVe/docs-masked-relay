@@ -18,6 +18,9 @@ state.md
 handoff-*
 audit-*
 
+# Internal research notes
+research/
+
 # Logs
 *.log
 
