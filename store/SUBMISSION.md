@@ -1,14 +1,21 @@
 # Store submission checklist — Chrome Web Store / Microsoft Edge Add-ons
 
-Version 0.2.0. Chrome Web Store submission sent 2026-11-23 and is pending review;
+Version 0.2.0. The first Chrome Web Store submission was rejected (Yellow Argon, excessive
+keywords); the corrected listing was resubmitted on 2026-11-23 and is pending review.
 Microsoft Edge Add-ons was not submitted. See the status section below. The checklist
 documents the preparation and remaining external actions of the project owner.
 
 ## Submission status (2026-11-23)
 
-- **Chrome Web Store**: submission sent on 2026-11-23 via Yandex Browser (Chromium MV3).
-  Status: «Ожидает рассмотрения» (pending review). Item ID:
-  `iieopopifchankeeciiekichbcfdbdnl`.
+- **Chrome Web Store — first submission**: sent on 2026-11-23 via Yandex Browser (Chromium
+  MV3) and rejected. Violation: **Yellow Argon**, «Избыточные ключевые слова в описании
+  продукта» — the full description contained a long keyword list of file formats
+  (`DOCX, XLSX, TXT, MD, JSON, JSONL, XML, PDF, DOC/XLS`).
+- **Correction**: the formats sentence in `store/chrome-listing.md` was replaced with prose
+  («Расширение работает с документами Word и Excel (включая старые версии)…»); the
+  abbreviation list must not be reintroduced.
+- **Chrome Web Store — resubmission**: sent on 2026-11-23; current status «Ожидает
+  рассмотрения» (pending review). Item ID: `iieopopifchankeeciiekichbcfdbdnl`.
   Auto-publish after approval: enabled. The extension is **not published yet**; the public
   listing URL will be added to this repository only after approval.
 - **Privacy policy URL**:
