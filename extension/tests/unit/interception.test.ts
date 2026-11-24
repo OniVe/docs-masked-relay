@@ -313,4 +313,21 @@ describe('filename masking', () => {
     expect(second).toBe(first);
     expect(vault.entities).toEqual(entities);
   });
+
+  it('masks a name with long numeric tokens instead of failing', () => {
+    const vault = createVault('');
+    const original = 'Результаты исследований_Беляев Игорь Сергеевич_45001287619_202607081234.pdf';
+    const masked = maskFileName(vault, original);
+    expect(masked).not.toContain('Беляев');
+    expect(masked).not.toMatch(/\d{7,}/);
+    expect(masked.endsWith('.pdf')).toBe(true);
+    expect(vault.filenameMap).toContainEqual({ original, masked });
+  });
+
+  it('replaces a bare long numeric stem with number', () => {
+    const vault = createVault('');
+    const masked = maskFileName(vault, 'test_45001287619.pdf');
+    expect(masked).toBe('test_number.pdf');
+    expect(masked).not.toMatch(/\d{7,}/);
+  });
 });

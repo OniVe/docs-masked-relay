@@ -9,6 +9,8 @@ remaining external actions of the project owner.
 - **Change**: PDF residual long-digit tokens (≥7 digits not covered by detectors) are now
   over-masked as whole `DOCNUM` tokens instead of failing the file with `PDF_RESIDUAL`.
   LeakGuard is not weakened; other formats are unchanged.
+- **Change**: filenames with unclassified long numeric tokens are now masked with `number`
+  instead of failing the upload.
 - **Package**: `store/packages/DocsMaskedRelay-0.2.1-chrome-webstore.zip`
   (built from `extension/` as `.output/docs-masked-relay-0.2.1-chrome.zip`).
 - **Status**: prepared for submission (2026-11-25); not uploaded to the Chrome Web Store.
