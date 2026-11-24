@@ -4,6 +4,7 @@
 <!-- PROJECT SHIELDS -->
 [![CI][ci-shield]][ci-url]
 [![License][license-shield]][license-url]
+[![Chrome Web Store][cws-shield]][cws-url]
 [![Manifest V3][mv3-shield]][mv3-url]
 [![TypeScript][ts-shield]][ts-url]
 
@@ -110,8 +111,8 @@ DocsMasked Relay — браузерное расширение для Chrome и 
 
 ### Установка
 
-**Из магазина.** Публикация пока недоступна — используйте локальную сборку или
-enterprise-пакет.
+**Из магазина.** Установите расширение из
+[Chrome Web Store](https://chromewebstore.google.com/detail/docsmasked-relay/iieopopifchankeeciiekichbcfdbdnl).
 
 **Локальная сборка:**
 
@@ -165,7 +166,7 @@ Windows-учётной записи.
 - [x] Локальная анонимизация и восстановление для офисных, текстовых и структурированных файлов
 - [x] PDF redaction, ручной режим, vault с парольной фразой
 - [x] WASM-детекторы и ZIP-кодек
-- [ ] Публикация в Chrome Web Store
+- [x] Публикация в Chrome Web Store
 - [ ] Edge Add-ons
 - [ ] Safari Web Extension для macOS
 - [ ] Расширение покрытия реальными Word/LibreOffice/PDFium-сценариями
@@ -230,6 +231,8 @@ attribution — в [NOTICE](NOTICE).
 [ci-url]: https://github.com/OniVe/docs-masked-relay/actions/workflows/ci.yml
 [license-shield]: https://img.shields.io/github/license/OniVe/docs-masked-relay.svg?style=for-the-badge
 [license-url]: https://github.com/OniVe/docs-masked-relay/blob/main/LICENSE
+[cws-shield]: https://img.shields.io/badge/Chrome%20Web%20Store-install-blue?style=for-the-badge&logo=googlechrome&logoColor=white
+[cws-url]: https://chromewebstore.google.com/detail/docsmasked-relay/iieopopifchankeeciiekichbcfdbdnl
 [mv3-shield]: https://img.shields.io/badge/Manifest-V3-blue?style=for-the-badge
 [mv3-url]: https://developer.chrome.com/docs/extensions/develop/migrate
 [ts-shield]: https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white

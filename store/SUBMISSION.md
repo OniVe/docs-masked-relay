@@ -1,23 +1,19 @@
 # Store submission checklist — Chrome Web Store / Microsoft Edge Add-ons
 
-Version 0.2.0. The first Chrome Web Store submission was rejected (Yellow Argon, excessive
-keywords); the corrected listing was resubmitted on 2026-11-23 and is pending review.
-Microsoft Edge Add-ons was not submitted. See the status section below. The checklist
-documents the preparation and remaining external actions of the project owner.
+Version 0.2.0. Published in Chrome Web Store on 2026-11-24; Microsoft Edge Add-ons was not
+submitted. See the status section below. The checklist documents the preparation and
+remaining external actions of the project owner.
 
-## Submission status (2026-11-23)
+## Submission status (2026-11-24)
 
-- **Chrome Web Store — first submission**: sent on 2026-11-23 via Yandex Browser (Chromium
-  MV3) and rejected. Violation: **Yellow Argon**, «Избыточные ключевые слова в описании
-  продукта» — the full description contained a long keyword list of file formats
-  (`DOCX, XLSX, TXT, MD, JSON, JSONL, XML, PDF, DOC/XLS`).
-- **Correction**: the formats sentence in `store/chrome-listing.md` was replaced with prose
-  («Расширение работает с документами Word и Excel (включая старые версии)…»); the
-  abbreviation list must not be reintroduced.
-- **Chrome Web Store — resubmission**: sent on 2026-11-23; current status «Ожидает
-  рассмотрения» (pending review). Item ID: `iieopopifchankeeciiekichbcfdbdnl`.
-  Auto-publish after approval: enabled. The extension is **not published yet**; the public
-  listing URL will be added to this repository only after approval.
+- **Chrome Web Store**: **published** on 2026-11-24. Public URL:
+  <https://chromewebstore.google.com/detail/docsmasked-relay/iieopopifchankeeciiekichbcfdbdnl>.
+  Item ID: `iieopopifchankeeciiekichbcfdbdnl`. Version 0.2.0.
+- **History**: the first submission (2026-11-23) was rejected under **Yellow Argon**
+  («Избыточные ключевые слова в описании продукта») because the description contained a
+  long list of file-format keywords. The formats sentence was rewritten as prose in
+  `store/chrome-listing.md`, and the corrected listing was resubmitted and published on
+  2026-11-24. The abbreviation list must not be reintroduced.
 - **Privacy policy URL**:
   `https://onive.github.io/docs-masked-relay/store/privacy-policy.html`.
 - **Support URL**: `https://github.com/OniVe/docs-masked-relay/issues`.
@@ -151,7 +147,8 @@ Deferred / external:
 - [ ] Store accounts, 2FA and fee (owner).
 - [ ] Hosting and public privacy-policy URL (owner).
 - [ ] Support contact (`[PUBLIC CONTACT]`) and website/support URL (owner).
-- [ ] Actual upload, review, and publish (owner; publication is forbidden in this task).
+- [x] Chrome Web Store upload, review, and publish — published 2026-11-24.
+- [ ] Microsoft Edge Add-ons submission and certification.
 - [ ] Safari/macOS track: Xcode wrapper, signing, notarization, App Store — separate track,
       not part of this package.
 - [ ] Re-audit/ship gate before any publication, if the project process requires it.
