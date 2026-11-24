@@ -19,6 +19,38 @@ export const PDF_EMAIL = 'john@example.com';
 export const PDF_PHONE = '+1 555 123 4567';
 export const PDF_PUBLIC = 'Public sentence stays here.';
 
+/**
+ * Long digit tokens that no detector classifies but the PDF path must still
+ * over-mask: LeakGuard's `paranoid:digits` blocks 7+ digit runs, and PDF
+ * redaction cannot be retried after shipping.
+ */
+export const PDF_RESIDUAL_NUMBERS = {
+  application: '8497221091',
+  decimal: '3251059.17',
+  certificate: '7fb994cefa22df2f3117559734fb23f5',
+  contract: '95511843-NKL',
+} as const;
+
+/** Born-digital one-page PDF whose only PII is unclassified long numbers. */
+export async function residualDigitsPdf(): Promise<Uint8Array> {
+  const document = await PDFDocument.create();
+  const page = document.addPage([612, 792]);
+  const font = await document.embedFont(StandardFonts.Helvetica);
+
+  page.drawText(PDF_PUBLIC, { x: 72, y: 720, size: 12, font });
+  page.drawText(`Application No ${PDF_RESIDUAL_NUMBERS.application}`, {
+    x: 72,
+    y: 690,
+    size: 12,
+    font,
+  });
+  page.drawText(`Value ${PDF_RESIDUAL_NUMBERS.decimal}`, { x: 72, y: 670, size: 12, font });
+  page.drawText(`Cert ${PDF_RESIDUAL_NUMBERS.certificate}`, { x: 72, y: 650, size: 12, font });
+  page.drawText(`Contract ${PDF_RESIDUAL_NUMBERS.contract}`, { x: 72, y: 630, size: 12, font });
+
+  return document.save();
+}
+
 /** 1x1 opaque PNG; enough to make an image-only page with no text layer. */
 const TINY_PNG_BASE64 =
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9Zl1sAAAAASUVORK5CYII=';

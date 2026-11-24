@@ -39,7 +39,7 @@ import {
 } from '@embedpdf/engine';
 import { PDFArray, PDFDict, PDFDocument, PDFName, PDFRef, PDFStream } from 'pdf-lib';
 import { detectAll } from '../detect';
-import { resolveOverlaps, type Span } from '../detect/span';
+import { blankSpans, resolveOverlaps, type Span } from '../detect/span';
 import { ensureStructuredScanner } from '../detect/wasm-scan';
 import { assertClean } from '../masker';
 import type {
@@ -453,6 +453,59 @@ async function searchText(
 }
 
 /**
+ * Characters that keep a residual digit run inside one printable token. A
+ * registry/contract number, a decimal amount and a hex certificate are single
+ * tokens: expanding to the token edges also removes `.17`, hex letters and
+ * `-НКЛ`, which a bare digit span would leave behind.
+ */
+const RESIDUAL_TOKEN_CHAR_RE = /[0-9A-Za-zА-Яа-яЁё_./-]/u;
+const RESIDUAL_TOKEN_EDGE_RE = /[._/-]/u;
+
+function isResidualTokenChar(value: string | undefined): boolean {
+  return value !== undefined && RESIDUAL_TOKEN_CHAR_RE.test(value);
+}
+
+function isResidualTokenEdge(value: string | undefined): boolean {
+  return value !== undefined && RESIDUAL_TOKEN_EDGE_RE.test(value);
+}
+
+/**
+ * Adds spans for long digit runs that no detector classified. PDF redaction is
+ * one-way and LeakGuard is fail-closed, so an unclassified 7+ digit token (a
+ * приказ/договор number, a hex id, a decimal amount) is over-masked here rather
+ * than failing the file wholesale. Detected spans are blanked first, so digits
+ * they already cover are never re-added.
+ */
+export function addResidualDigitSpans(text: string, spans: readonly Span[]): Span[] {
+  const blanked = blankSpans(text, spans);
+  const extra: Span[] = [];
+
+  for (const match of blanked.matchAll(/\d{7,}/gu)) {
+    const index = match.index ?? 0;
+    let start = index;
+    let end = index + match[0].length;
+
+    while (start > 0 && isResidualTokenChar(text[start - 1])) start -= 1;
+    while (end < text.length && isResidualTokenChar(text[end])) end += 1;
+    // A separator on the token edge is punctuation, not part of the value.
+    while (start < end && isResidualTokenEdge(text[start])) start += 1;
+    while (end > start && isResidualTokenEdge(text[end - 1])) end -= 1;
+    if (end <= start) continue;
+
+    extra.push({
+      label: 'DOCNUM',
+      start,
+      end,
+      text: text.slice(start, end),
+      priority: 92,
+      ruleId: 'pdf.residual-digits',
+    });
+  }
+
+  return resolveOverlaps([...spans, ...extra]);
+}
+
+/**
  * Converts one detected span into PDFium quads. The mapped character range is
  * authoritative; `search.query()` is preferred when it returns exactly that
  * range, and `layout.segments()` is the fallback after verifying the slice.
@@ -542,7 +595,10 @@ async function collectPageRedactions(
     if (snapshot.charCount === 0) throw scannedError(pageNumber);
     if (snapshot.text.trim().length === 0) continue;
 
-    const spans = resolveOverlaps(detectAll(snapshot.text, config));
+    const spans = addResidualDigitSpans(
+      snapshot.text,
+      resolveOverlaps(detectAll(snapshot.text, config)),
+    );
     if (spans.length === 0) continue;
 
     const layout = await page.text.layout();

@@ -9,7 +9,9 @@ import {
   PDF_PERSON,
   PDF_PHONE,
   PDF_PUBLIC,
+  PDF_RESIDUAL_NUMBERS,
   pdfWithPages,
+  residualDigitsPdf,
   samplePdf,
   scannedPdf,
   twoPagePiiPdf,
@@ -241,6 +243,29 @@ test.describe('M5a PDF true redaction (offscreen + PDFium)', () => {
     expect(response.error?.code).toBe('UNSUPPORTED');
     expect(response.error?.message).toContain('scanned page 1');
     expect(response.error?.message).toContain('OCR not supported');
+  });
+
+  test('over-masks unclassified long digit tokens instead of failing LeakGuard', async ({
+    extensionContext: context,
+  }) => {
+    const page = await openPopup(context);
+    const input = await residualDigitsPdf();
+    const response = await anonymize(page, input, { chatId: 'pdf-e2e-residual-digits' });
+    expect(response.ok, JSON.stringify(response.error)).toBe(true);
+    if (!response.result) throw new Error('missing result');
+
+    const masked = new Uint8Array(Buffer.from(response.result.maskedBytes, 'base64'));
+    const text = normalized(await extractPdfText(masked));
+    expect(text).not.toMatch(/\d{7,}/u);
+    for (const value of [
+      PDF_RESIDUAL_NUMBERS.application,
+      PDF_RESIDUAL_NUMBERS.decimal,
+      PDF_RESIDUAL_NUMBERS.certificate,
+      PDF_RESIDUAL_NUMBERS.contract,
+    ]) {
+      expect(text).not.toContain(value);
+    }
+    expect(text).toContain(PDF_PUBLIC);
   });
 
   test('rejects restore and enforces the 200-page limit', async ({ extensionContext: context }) => {

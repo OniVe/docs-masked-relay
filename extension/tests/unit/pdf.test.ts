@@ -13,7 +13,9 @@ import { describe, expect, it } from 'vitest';
 import { resetDb } from '../../src/background/db';
 import { processRestore } from '../../src/background/process';
 import { closeVaultStore, initVaultStore } from '../../src/background/vault-store';
+import type { Span } from '../../src/core/detect/span';
 import {
+  addResidualDigitSpans,
   anonymizePdf,
   assertNoPdfCarriers,
   hasRawPiiSurface,
@@ -249,5 +251,68 @@ describe('PDF adapter preflight (no engine boot)', () => {
     } finally {
       await closeVaultStore();
     }
+  });
+});
+
+describe('PDF residual digit spans (LeakGuard follow-up)', () => {
+  function existingSpan(text: string, value: string): Span {
+    const start = text.indexOf(value);
+    return {
+      label: 'DOCNUM',
+      start,
+      end: start + value.length,
+      text: value,
+      priority: 92,
+      ruleId: 'docnum',
+    };
+  }
+
+  function residualSurfaces(text: string, spans: readonly Span[] = []): string[] {
+    return addResidualDigitSpans(text, spans).map((span) => span.text);
+  }
+
+  it('masks a standalone 7+ digit number as a PDF DOCNUM span', () => {
+    const text = 'Application No 8497221091';
+    const [span] = addResidualDigitSpans(text, []);
+    expect(span).toMatchObject({
+      label: 'DOCNUM',
+      start: text.indexOf('8497221091'),
+      end: text.length,
+      text: '8497221091',
+      priority: 92,
+      ruleId: 'pdf.residual-digits',
+    });
+  });
+
+  it('expands a decimal amount to the whole token', () => {
+    expect(residualSurfaces('Value 3251059.17')).toEqual(['3251059.17']);
+  });
+
+  it('expands a hex certificate to the whole token', () => {
+    expect(residualSurfaces('Cert 7fb994cefa22df2f3117559734fb23f5')).toEqual([
+      '7fb994cefa22df2f3117559734fb23f5',
+    ]);
+  });
+
+  it('expands a contract number with a Cyrillic suffix to the whole token', () => {
+    expect(residualSurfaces('Contract 95511843-НКЛ')).toEqual(['95511843-НКЛ']);
+  });
+
+  it('ignores short numbers', () => {
+    expect(residualSurfaces('No 12345, ref 123456.')).toEqual([]);
+  });
+
+  it('ignores digits already covered by a detected span', () => {
+    const text = 'Card 4111111111111111 belongs to the client';
+    const card = existingSpan(text, '4111111111111111');
+    const result = addResidualDigitSpans(text, [card]);
+    expect(result).toEqual([card]);
+  });
+
+  it('returns the same spans when there is no residual digit run', () => {
+    const text = 'Public sentence stays here.';
+    const spans = [existingSpan(text, 'sentence')];
+    expect(addResidualDigitSpans(text, spans)).toEqual(spans);
+    expect(addResidualDigitSpans(text, [])).toEqual([]);
   });
 });
