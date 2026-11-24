@@ -4,6 +4,17 @@ Version 0.2.0. Published in Chrome Web Store on 2026-11-24; Microsoft Edge Add-o
 submitted. See the status section below. The checklist documents the preparation and
 remaining external actions of the project owner.
 
+## Update 0.2.1 (2026-11-25)
+
+- **Change**: PDF residual long-digit tokens (≥7 digits not covered by detectors) are now
+  over-masked as whole `DOCNUM` tokens instead of failing the file with `PDF_RESIDUAL`.
+  LeakGuard is not weakened; other formats are unchanged.
+- **Package**: `store/packages/DocsMaskedRelay-0.2.1-chrome-webstore.zip`
+  (built from `extension/` as `.output/docs-masked-relay-0.2.1-chrome.zip`).
+- **Status**: prepared for submission (2026-11-25); not uploaded to the Chrome Web Store.
+
+Current package facts are recorded in `store/packages/README.md`.
+
 ## Submission status (2026-11-24)
 
 - **Chrome Web Store**: **published** on 2026-11-24. Public URL:

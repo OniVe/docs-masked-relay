@@ -1,6 +1,6 @@
 # Политика конфиденциальности DocsMasked Relay
 
-Дата: 23.11.2026. Версия расширения: 0.2.0.
+Дата: 23.11.2026. Версия расширения: 0.2.1.
 
 Политика относится к расширению DocsMasked Relay для Chrome (Chrome Web Store) и
 Microsoft Edge (Edge Add-ons), а также к Safari Web Extension, если она будет
