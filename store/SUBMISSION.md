@@ -13,7 +13,8 @@ remaining external actions of the project owner.
   instead of failing the upload.
 - **Package**: `store/packages/DocsMaskedRelay-0.2.1-chrome-webstore.zip`
   (built from `extension/` as `.output/docs-masked-relay-0.2.1-chrome.zip`).
-- **Status**: prepared for submission (2026-11-25); not uploaded to the Chrome Web Store.
+- **Status**: submitted for review on 2026-11-25; dashboard status: `Ожидает рассмотрения`
+  (draft version 0.2.1; published version remains 0.2.0 until review completes).
 
 Current package facts are recorded in `store/packages/README.md`.
 
