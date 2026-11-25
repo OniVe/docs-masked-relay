@@ -1,4 +1,4 @@
-# Пакет для Chrome Web Store — DocsMasked Relay 0.2.1
+# Пакет для Chrome Web Store — DocsMasked Relay 0.2.2
 
 Готовый архив для загрузки в Chrome Web Store. Публикация не выполнялась и не входит в
 задачу: загружает, отправляет на проверку и публикует владелец проекта.
@@ -7,12 +7,12 @@
 
 | Параметр | Значение |
 | --- | --- |
-| Путь | `store/packages/DocsMaskedRelay-0.2.1-chrome-webstore.zip` |
-| Размер | 5 994 373 байт (5,72 МиБ) |
-| SHA256 | `aa70edb0c7c60353f6e9638a2c712e28939fbec54e6d1b03fd2e590bd009c6db` |
-| Версия | 0.2.1 |
+| Путь | `store/packages/DocsMaskedRelay-0.2.2-chrome-webstore.zip` |
+| Размер | 5 996 396 байт (5,72 МиБ) |
+| SHA256 | `aa81f1d5281a3906f2e0a58ab915f317c56db77c69e9192f32509349ce364428` |
+| Версия | 0.2.2 |
 | Файлов внутри | 52 |
-| Размер распакованного | 15 789 695 байт |
+| Размер распакованного | 15 797 859 байт |
 
 SHA256 и размер также записаны в `store/packages/SHA256SUMS`. Проверка целостности:
 
@@ -25,11 +25,19 @@ sha256sum -c SHA256SUMS
 хранятся только `README.md`, `SHA256SUMS` и `.gitignore`, а сам ZIP передаётся владельцу
 отдельно.
 
+## История пакетов
+
+| Версия | Файл | Размер | SHA256 | Статус |
+| --- | --- | --- | --- | --- |
+| 0.2.2 | `DocsMaskedRelay-0.2.2-chrome-webstore.zip` | 5 996 396 байт | `aa81f1d5281a3906f2e0a58ab915f317c56db77c69e9192f32509349ce364428` | подготовлен к отправке |
+| 0.2.1 | `DocsMaskedRelay-0.2.1-chrome-webstore.zip` | 5 994 373 байт | `aa70edb0c7c60353f6e9638a2c712e28939fbec54e6d1b03fd2e590bd009c6db` | опубликован 2026-11-25 |
+| 0.2.0 | `DocsMaskedRelay-0.2.0-chrome-webstore.zip` | 5 993 985 байт | `6ff5fd9da50cbd068e35e6aa95eb084d22ddebfd17a69626fe70189852f385a1` | опубликован 2026-11-24, заменён 0.2.1 |
+
 ## Что загружать
 
 Загружать в Chrome Web Store нужно **именно этот ZIP**:
 
-`DocsMaskedRelay-0.2.1-chrome-webstore.zip`
+`DocsMaskedRelay-0.2.2-chrome-webstore.zip`
 
 Не загружать:
 
@@ -39,7 +47,8 @@ sha256sum -c SHA256SUMS
 
 ## Проверка пакета (выполнена)
 
-- `manifest.json` лежит в корне архива, `"version": "0.2.1"`, Manifest V3.
+- `manifest.json` лежит в корне архива, `"version": "0.2.2"`, Manifest V3, разрешения не
+  изменились: `storage`, `unlimitedStorage`, `offscreen`.
 - 52 файла; совпадает с текущей сборкой `.output/chrome-mv3`.
 - Нет `.map`, `.ts`, `.tsx`, `.pem`, `.crx`, `node_modules`, тестов/спеков, `.env` и
   исходных карт.
@@ -50,22 +59,23 @@ sha256sum -c SHA256SUMS
 - `unzip -t` — без ошибок.
 - SHA256 `background.js` внутри ZIP совпадает с
   `extension/.output/chrome-mv3/background.js`:
-  `594395e1dbac716a6988963728c3909f1e4f948dbd79c80d6ed2ed8f1dc3eae0`.
+  `bd29837466dcf579ce2c8032a7ba247640b16cb58d3090abf48dc77a290ae804`.
 
-Пакет собран из текущего исходного кода командой `bun run zip` в `extension/`, версия
-0.2.1. ZIP не коммитится: его нужно собрать локально и при необходимости переименовать в
-`DocsMaskedRelay-0.2.1-chrome-webstore.zip` перед загрузкой в магазин.
+Пакет собран из текущего исходного кода командами `bun run build` и `bun run zip` в
+`extension/`, версия 0.2.2. ZIP не коммитится: его нужно собрать локально и при
+необходимости переименовать в `DocsMaskedRelay-0.2.2-chrome-webstore.zip` перед загрузкой
+в магазин.
 
 ## Чек-лист Chrome Web Store
 
 1. **Аккаунт:** Chrome Web Store Developer Dashboard, подтверждённый контактный email,
    2FA, регистрационный сбор (исторически 5 USD; проверить актуальную сумму).
 2. **Новый элемент:** Dashboard → New item → загрузить
-   `DocsMaskedRelay-0.2.1-chrome-webstore.zip`. Убедиться, что dashboard показывает
-   версию 0.2.1, название и описание.
+   `DocsMaskedRelay-0.2.2-chrome-webstore.zip`. Убедиться, что dashboard показывает
+   версию 0.2.2, название и описание.
 3. **Листинг:** тексты брать из `store/chrome-listing.md` — название, краткое и полное
    описание, категория, обоснование разрешений, ответы о данных. Там остаются
-   placeholder-ы, которые заполняет владелец; этот файл не изменялся.
+   placeholder-ы, которые заполняет владелец.
 4. **Графика:** иконка `store/assets/icon-128.png` (128×128) и четыре скриншота
    1280×800 из `store/assets/`:
    `screenshot-options-1280x800.png`, `screenshot-options-columns-1280x800.png`,

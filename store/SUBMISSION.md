@@ -1,8 +1,26 @@
 # Store submission checklist — Chrome Web Store / Microsoft Edge Add-ons
 
-Version 0.2.0. Published in Chrome Web Store on 2026-11-24; Microsoft Edge Add-ons was not
-submitted. See the status section below. The checklist documents the preparation and
-remaining external actions of the project owner.
+Version 0.2.2 prepared for submission. 0.2.1 published in Chrome Web Store on 2026-11-25;
+0.2.0 published on 2026-11-24 and is superseded. Microsoft Edge Add-ons was not submitted.
+See the status section below. The checklist documents the preparation and remaining external
+actions of the project owner.
+
+## Update 0.2.2 (2026-11-25)
+
+- **Change**: HTML format support (`text/html`, `.htm`). Text nodes, attribute values,
+  comments, CDATA and raw-text element content (`script`, `style`, `textarea`, `title`) are
+  masked/restored; tags, attribute names and formatting are preserved. Restoration returns
+  the original bytes in the original encoding/BOM.
+- **Safety**: fail-closed policy for malformed HTML (unclosed comments, quotes or raw-text
+  blocks reject the whole file). `data:` values in `src`/`href` are classified: known binary
+  types are skipped with a warning, text/unknown types are scanned, and `;base64`,
+  percent-encoded, PDF and office payloads are rejected.
+- **Package**: `store/packages/DocsMaskedRelay-0.2.2-chrome-webstore.zip`
+  (built from `extension/` as `.output/docs-masked-relay-0.2.2-chrome.zip`).
+- **Status**: prepared for submission; not uploaded to Chrome Web Store. Dashboard status
+  remains `Опубликовано - для всех` for 0.2.1.
+
+Current package facts are recorded in `store/packages/README.md`.
 
 ## Update 0.2.1 (2026-11-25)
 
@@ -13,16 +31,15 @@ remaining external actions of the project owner.
   instead of failing the upload.
 - **Package**: `store/packages/DocsMaskedRelay-0.2.1-chrome-webstore.zip`
   (built from `extension/` as `.output/docs-masked-relay-0.2.1-chrome.zip`).
-- **Status**: submitted for review on 2026-11-25; dashboard status: `Ожидает рассмотрения`
-  (draft version 0.2.1; published version remains 0.2.0 until review completes).
-
-Current package facts are recorded in `store/packages/README.md`.
+- **Status**: **published on 2026-11-25** for all users; dashboard status
+  `Опубликовано - для всех`. 0.2.0 is superseded.
 
 ## Submission status (2026-11-24)
 
-- **Chrome Web Store**: **published** on 2026-11-24. Public URL:
+- **Chrome Web Store**: **published**. Public URL:
   <https://chromewebstore.google.com/detail/docsmasked-relay/iieopopifchankeeciiekichbcfdbdnl>.
-  Item ID: `iieopopifchankeeciiekichbcfdbdnl`. Version 0.2.0.
+  Item ID: `iieopopifchankeeciiekichbcfdbdnl`. Version 0.2.0 published on 2026-11-24;
+  version 0.2.1 published for all users on 2026-11-25 (0.2.0 superseded).
 - **History**: the first submission (2026-11-23) was rejected under **Yellow Argon**
   («Избыточные ключевые слова в описании продукта») because the description contained a
   long list of file-format keywords. The formats sentence was rewritten as prose in
@@ -50,11 +67,11 @@ bun run zip
 
 Expected:
 
-- `.output/chrome-mv3/manifest.json`: `"version": "0.2.0"`, description
+- `.output/chrome-mv3/manifest.json`: `"version": "0.2.2"`, description
   `Local PII anonymization for ChatGPT uploads/downloads. Original PII stays on your device.`
 - `.output/chrome-mv3` contains `manifest.json` at its root, background service worker,
   popup/options, content scripts, `offscreen.html`, WASM/worker assets and icons.
-- `.output/docs-masked-relay-0.2.0-chrome.zip` exists.
+- `.output/docs-masked-relay-0.2.2-chrome.zip` exists.
 - No `dist/`, `.output/` or secrets are committed.
 
 Quick manifest check:
@@ -84,8 +101,8 @@ screenshots.
 ## 2. Chrome Web Store — step by step
 
 1. Open the Chrome Web Store Developer Dashboard → **New item**.
-2. Upload `.output/docs-masked-relay-0.2.0-chrome.zip`. Confirm the dashboard shows
-   version 0.2.0 and the expected name/description.
+2. Upload `.output/docs-masked-relay-0.2.2-chrome.zip`. Confirm the dashboard shows
+   version 0.2.2 and the expected name/description.
 3. **Store listing**:
    - Name, short description, full description, category — from `store/chrome-listing.md`.
    - Language: **Russian (ru)** — listing copy, screenshots and UI are Russian.
@@ -132,7 +149,7 @@ screenshots.
 | Item | Value |
 | --- | --- |
 | Manifest version | 3 |
-| Extension version | 0.2.0 |
+| Extension version | 0.2.2 |
 | Permissions | `storage`, `unlimitedStorage`, `offscreen` |
 | Host permissions | `https://chatgpt.com/*`, `https://chat.openai.com/*`, `https://*.oaiusercontent.com/*` |
 | Content scripts | MAIN + ISOLATED, only `chatgpt.com` / `chat.openai.com` |
@@ -147,7 +164,7 @@ screenshots.
 Ready:
 
 - [x] Manifest description corrected (no "data never leaves the device" claim).
-- [x] Version bumped to 0.2.0.
+- [x] Version bumped to 0.2.2.
 - [x] Privacy policy updated with Limited Use statement, Edge section, transfer/retention/
       deletion details.
 - [x] Standalone HTTPS-ready privacy page.

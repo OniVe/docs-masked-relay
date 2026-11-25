@@ -2,7 +2,7 @@
   "name": "docs-masked-relay",
   "description": "DocsMasked Relay — local PII anonymization for ChatGPT file uploads/downloads",
   "private": true,
-  "version": "0.2.1",
+  "version": "0.2.2",
   "type": "module",
   "scripts": {
     "dev": "wxt -b chrome",

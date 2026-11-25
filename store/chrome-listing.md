@@ -1,4 +1,4 @@
-# Chrome Web Store — описание DocsMasked Relay 0.2.1
+# Chrome Web Store — описание DocsMasked Relay 0.2.2
 
 Черновик для отправки в магазин. Не публиковать, пока не устранены внешние блокеры из
 `SUBMISSION.md`. Значения в `<угловых скобках>` — заполняет владелец проекта.
@@ -24,8 +24,8 @@
 | Сайт | `<project website or public repository URL>` |
 | Support URL | `<public support URL or issue tracker>` |
 | URL политики конфиденциальности | `<HOSTING URL>` (размещённый `store/privacy-policy.html`) |
-| Версия | 0.2.1 |
-| Пакет | `.output/docs-masked-relay-0.2.1-chrome.zip` |
+| Версия | 0.2.2 |
+| Пакет | `.output/docs-masked-relay-0.2.2-chrome.zip` |
 
 ### Полное описание (черновик)
 
@@ -167,4 +167,4 @@
       «ChatGPT не увидит ваши данные».
 - [ ] URL политики конфиденциальности открывается по HTTPS и соответствует версии и
       поведению пакета.
-- [ ] В корне zip лежит `manifest.json`, версия 0.2.1, описание совпадает с листингом.
+- [ ] В корне zip лежит `manifest.json`, версия 0.2.2, описание совпадает с листингом.
