@@ -1,9 +1,9 @@
 # Store submission checklist — Chrome Web Store / Microsoft Edge Add-ons
 
-Version 0.2.2 prepared for submission. 0.2.1 published in Chrome Web Store on 2026-11-25;
-0.2.0 published on 2026-11-24 and is superseded. Microsoft Edge Add-ons was not submitted.
-See the status section below. The checklist documents the preparation and remaining external
-actions of the project owner.
+Version 0.2.2 submitted for review on 2026-11-25. 0.2.1 published in Chrome Web Store on
+2026-11-25; 0.2.0 published on 2026-11-24 and is superseded. Microsoft Edge Add-ons was not
+submitted. See the status section below. The checklist documents the preparation and remaining
+external actions of the project owner.
 
 ## Update 0.2.2 (2026-11-25)
 
@@ -17,8 +17,8 @@ actions of the project owner.
   percent-encoded, PDF and office payloads are rejected.
 - **Package**: `store/packages/DocsMaskedRelay-0.2.2-chrome-webstore.zip`
   (built from `extension/` as `.output/docs-masked-relay-0.2.2-chrome.zip`).
-- **Status**: prepared for submission; not uploaded to Chrome Web Store. Dashboard status
-  remains `Опубликовано - для всех` for 0.2.1.
+- **Status**: submitted for review on 2026-11-25; dashboard status: `Ожидает рассмотрения`
+  (draft version 0.2.2; published version remains 0.2.1 until review completes).
 
 Current package facts are recorded in `store/packages/README.md`.
 
