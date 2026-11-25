@@ -132,7 +132,7 @@ bun run build
 
 ```sh
 cd extension
-bun run ci          # Biome + tsc + 700 unit-тестов
+bun run ci          # Biome + tsc + 702 unit-тестов
 bun run test:e2e    # Playwright, только fixed harness, один worker
 ```
 

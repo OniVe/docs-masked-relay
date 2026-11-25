@@ -192,21 +192,69 @@ describe('HTML adapter', () => {
     }
   });
 
-  it('skips data: URI attribute values with a warning', async () => {
+  it('masks names split across adjacent text nodes and fields', async () => {
+    const cases = [
+      '<div><span>Иван</span> <span>Петров</span></div>',
+      '<form><input name="first" value="Иван"><input name="last" value="Петров"></form>',
+      '<div><span class="first-name">Иван</span><span class="last-name">Петров</span></div>',
+    ] as const;
+
+    for (const source of cases) {
+      const { masked, restored } = await roundTrip('split-name.html', source);
+      expect(masked).not.toContain('Иван');
+      expect(masked).not.toContain('Петров');
+      expect(masked).toContain('[[');
+      expect(restored).toBe(source);
+    }
+  });
+
+  it('scans textual data: URIs and skips only known binary payloads', async () => {
     const source = [
-      `<img src="data:image/png;base64,AAAA" href='data:text/plain,hello' alt="${PERSON}">`,
-      `<a href="data:text/plain,${EMAIL}">link</a>`,
+      `<img src="data:image/png;base64,AAAA" href="data:text/plain,${EMAIL}" alt="${PERSON}">`,
+      `<a href='data:text/plain,hello'>link</a>`,
+      `<p title="data:text/plain,${PERSON}">text</p>`,
+      `<object data="data:image/svg+xml,<svg><text>${PERSON}</text></svg>"></object>`,
     ].join('\n');
 
     const { masked, restored, result } = await roundTrip('data-uri.html', source);
 
     expect(masked).toContain('src="data:image/png;base64,AAAA"');
     expect(masked).toContain("href='data:text/plain,hello'");
-    expect(masked).toContain(`href="data:text/plain,${EMAIL}"`);
+    expect(masked).not.toContain(EMAIL);
     expect(masked).not.toContain(PERSON);
-    expect(masked).toContain('alt="[[');
-    expect(result.warnings.some((warning) => /data: URI/u.test(warning))).toBe(true);
+    expect(masked).toMatch(/href="data:text\/plain,\[\[[A-Z0-9]{5}_EMAIL_1\]\]"/u);
+    expect(masked).toMatch(/title="data:text\/plain,\[\[[A-Z0-9]{5}_PERSON_1\]\]"/u);
+    expect(masked).toMatch(
+      /data:image\/svg\+xml,<svg><text>\[\[[A-Z0-9]{5}_PERSON_1\]\]<\/text><\/svg>/u,
+    );
+    expect(result.warnings.filter((warning) => /data: URI/u.test(warning))).toHaveLength(1);
     expect(restored).toBe(source);
+  });
+
+  it('fails closed on unscannable data: URIs', async () => {
+    const cases = [
+      ['<a href="data:text/plain;base64,SXZhbg==">x</a>', /base64/u],
+      ['<a href="data:text/plain,100%25">x</a>', /percent/u],
+      ['<a href="data:;base64,AAAA">x</a>', /base64/u],
+      ['<a href="data:application/pdf;base64,AAAA">x</a>', /application\/pdf/u],
+      [
+        '<a href="data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,AAAA">x</a>',
+        /openxmlformats/u,
+      ],
+      ['<a href="data:image/png;base64">x</a>', /comma/u],
+    ] as const;
+
+    for (const [source, message] of cases) {
+      const vault = createVault(source);
+      await expect(
+        anonymizeHtml(fileOf('bad-data-uri.html', encoder.encode(source)), {
+          vault,
+          maxBytes: 1_000_000,
+        }),
+      ).rejects.toThrow(message);
+      expect(vault.occurrences).toHaveLength(0);
+      expect(vault.files).toHaveLength(0);
+    }
   });
 
   it('exposes .html/.htm extensions and the html format', () => {

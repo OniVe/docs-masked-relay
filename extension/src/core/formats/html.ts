@@ -19,6 +19,19 @@
  * the masked output keeps the source encoding, BOM and `<meta charset>`.
  * Malformed input that the scanner cannot delimit fails closed instead of
  * passing text through unmasked.
+ *
+ * `data:` URIs in `src`/`href` are classified: known binary media types
+ * (`image/*` except SVG, `audio/*`, `video/*`, `font/*`,
+ * `application/octet-stream`) are skipped with a warning because their
+ * payload is not text. Textual/unknown payloads are scanned normally, but
+ * `;base64`, percent-encoded, PDF and office payloads fail closed instead of
+ * being passed through unscanned.
+ *
+ * Name detection for every range forces `aggressive` + `loneFirstNames`:
+ * markup routinely splits one person across adjacent nodes/fields
+ * (`<span>Иван</span> <span>Петров</span>`), so a lone first name or surname
+ * must also be masked. Over-masking is accepted; all other detector options
+ * (including LeakGuard settings) are preserved.
  */
 
 import { ensureStructuredScanner } from '../detect/wasm-scan';
@@ -189,6 +202,69 @@ interface ParsedStartTag {
   selfClosing: boolean;
 }
 
+type DataUriAction = 'skip' | 'scan';
+
+/**
+ * Binary payloads whose text representation is never PII. `image/svg+xml` is
+ * deliberately not here: SVG is XML text and can carry names/emails.
+ */
+function isSkippableDataMediaType(mediaType: string): boolean {
+  if (mediaType === 'application/octet-stream') return true;
+  if (mediaType === 'image/svg+xml') return false;
+  return (
+    mediaType.startsWith('image/') ||
+    mediaType.startsWith('audio/') ||
+    mediaType.startsWith('video/') ||
+    mediaType.startsWith('font/')
+  );
+}
+
+/**
+ * Binary office/PDF containers that are neither safe to skip silently nor
+ * reliably scan as text: fail closed instead of passing a payload through.
+ */
+function isUnscannableOfficeMediaType(mediaType: string): boolean {
+  return (
+    mediaType === 'application/pdf' ||
+    mediaType === 'application/msword' ||
+    mediaType === 'application/x-msword' ||
+    mediaType === 'application/x-msexcel' ||
+    mediaType === 'application/x-mspowerpoint' ||
+    mediaType.startsWith('application/vnd.ms-') ||
+    mediaType.startsWith('application/vnd.openxmlformats-officedocument.') ||
+    mediaType.startsWith('application/vnd.oasis.opendocument.')
+  );
+}
+
+/**
+ * Parses `data:[<mediatype>][;base64],<payload>` enough to decide whether the
+ * raw attribute value can be scanned as text. A missing comma is malformed;
+ * binary office/PDF media types and textual base64/percent-encoded payloads
+ * fail closed because their visible bytes are not the underlying PII.
+ */
+function classifyDataUri(value: string, offset: number): DataUriAction {
+  const trimmed = value.trimStart();
+  const comma = trimmed.indexOf(',');
+  if (comma < 0) throw htmlError('malformed data: URI without a comma', offset);
+
+  const header = trimmed.slice(5, comma);
+  const parts = header.split(';');
+  const mediaType = (parts[0] ?? '').trim().toLowerCase();
+  const base64 = parts.slice(1).some((part) => part.trim().toLowerCase() === 'base64');
+
+  if (isSkippableDataMediaType(mediaType)) return 'skip';
+  if (isUnscannableOfficeMediaType(mediaType)) {
+    throw htmlError(`binary ${mediaType} data: URI cannot be scanned`, offset);
+  }
+  if (base64) {
+    throw htmlError('base64-encoded textual data: URI cannot be scanned reliably', offset);
+  }
+  if (trimmed.includes('%')) {
+    throw htmlError('percent-encoded textual data: URI cannot be scanned reliably', offset);
+  }
+  return 'scan';
+}
+
 /**
  * Parses an opening tag enough to locate quoted/unquoted attribute values.
  * Boolean attributes are accepted. Unquoted values end at whitespace or `>`.
@@ -198,7 +274,7 @@ function parseStartTag(
   start: number,
   end: number,
   pushRange: (range: HtmlRange) => void,
-  countDataUri: (value: string) => boolean,
+  handleDataUri: (value: string, valueStart: number) => boolean,
 ): ParsedStartTag {
   const nameStart = start + 1;
   const nameEnd = readTagName(text, nameStart);
@@ -251,7 +327,9 @@ function parseStartTag(
     if (valueEnd <= valueStart) continue;
     const lowerName = attrName.toLowerCase();
     const value = text.slice(valueStart, valueEnd);
-    if ((lowerName === 'src' || lowerName === 'href') && countDataUri(value)) continue;
+    if ((lowerName === 'src' || lowerName === 'href') && handleDataUri(value, valueStart)) {
+      continue;
+    }
     if (valueEnd - valueStart > MAX_RANGE_CHARS) {
       throw htmlError('attribute value exceeds the 4 MiB limit', valueStart);
     }
@@ -296,10 +374,14 @@ function scanHtml(text: string): HtmlScan {
     pushRange({ start, end, kind: 'text' });
   };
 
-  const countDataUri = (value: string): boolean => {
-    if (!value.trimStart().toLowerCase().startsWith('data:')) return false;
-    dataUriSkips += 1;
-    return true;
+  const handleDataUri = (value: string, valueStart: number): boolean => {
+    const trimmed = value.trimStart();
+    if (!trimmed.toLowerCase().startsWith('data:')) return false;
+    if (classifyDataUri(trimmed, valueStart) === 'skip') {
+      dataUriSkips += 1;
+      return true;
+    }
+    return false;
   };
 
   let cursor = 0;
@@ -352,7 +434,7 @@ function scanHtml(text: string): HtmlScan {
       continue;
     }
 
-    const tag = parseStartTag(text, tagStart, end, pushRange, countDataUri);
+    const tag = parseStartTag(text, tagStart, end, pushRange, handleDataUri);
     cursor = end;
     if (RAW_TEXT_TAGS.has(tag.name.toLowerCase()) && !tag.selfClosing) {
       const close = findRawTextClose(text, tag.name.toLowerCase(), cursor);
@@ -481,6 +563,14 @@ export async function anonymizeHtml(
 
   const scan = scanHtml(text);
 
+  const detectorConfig: DetectionConfig = {
+    ...(ctx.config ?? {}),
+    // Markup splits names across nodes/fields; a lone first name or surname
+    // must still be masked. Other options (labels, allowlist, LeakGuard) stay.
+    aggressive: true,
+    loneFirstNames: true,
+  };
+
   const snapshot = structuredClone(ctx.vault);
   const occurrenceStart = ctx.vault.occurrences.length;
   const outcome: MaskOutcome = {
@@ -495,7 +585,7 @@ export async function anonymizeHtml(
   try {
     // One index for the whole document; every range reuses it incrementally.
     const vaultIndex = createVaultIndex(ctx.vault);
-    maskRanges(text, scan.ranges, ctx.config ?? {}, ctx.vault, outcome, vaultIndex);
+    maskRanges(text, scan.ranges, detectorConfig, ctx.vault, outcome, vaultIndex);
     maskedText = applyHtmlEditsLinear(text, outcome.edits);
     // Keep the source encoding/BOM: `<meta charset>` stays honest without a
     // rewrite, and the masked document remains a valid HTML file for any

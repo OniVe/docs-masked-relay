@@ -254,10 +254,13 @@ DM_CHROMIUM_BINARY="C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe
   Кавычки и `>` внутри значений учитываются, `<` внутри raw-text-блоков не парсится как
   разметка. Незакрытые комментарии, CDATA, кавычки и raw-text-блоки отклоняют файл;
   одиночный диапазон больше 4 МиБ и больше 1 000 000 диапазонов — тоже. Значения
-  `src`/`href`, начинающиеся с `data:`, пропускаются с предупреждением: двоичный payload
-  не сканируется. Сущности не декодируются перед детекцией (имя, разделённое `&nbsp;`,
-  может остаться незамеченным — принятое ограничение). Исходная кодировка/BOM и
-  `<meta charset>` не переписываются; восстановление возвращает исходные байты.
+  `src`/`href` с `data:` классифицируются: известные двоичные типы (`image/*` кроме
+  SVG, `audio/*`, `video/*`, `font/*`, `application/octet-stream`) пропускаются с
+  предупреждением; текстовые/неизвестные payload'ы сканируются, а `;base64`,
+  percent-encoded, PDF и office — отклоняются. Сущности не декодируются перед
+  детекцией (имя, разделённое `&nbsp;`, может остаться незамеченным — принятое
+  ограничение). Исходная кодировка/BOM и `<meta charset>` не переписываются;
+  восстановление возвращает исходные байты.
 - **Типы файлов и маршрутизация.** Расширение важнее MIME (`.xml` + `application/json` —
   XML, `.json` + `text/markdown` — JSON, `.html` + `application/json` — HTML); PDF —
   только `.pdf` или неизвестное расширение + `application/pdf`; обезличенный MIME —
@@ -320,7 +323,7 @@ PDF обрабатывается в background page. Требуется Safari 1
   проверка утечек длинных цифр), XML (namespaces/CDATA/attrs/comments/PI/DTD/UTF-16/1251,
   `xml:*`-значения и URI path/lone id, structural allowlist/Latin, xml:lang/space
   validation, role-aware name-элементы/атрибуты, declaration label, mixed EOL),
-  HTML (text/attrs/comments/CDATA/script/style/textarea/title, data: skip, cp1251/
+  HTML (text/attrs/comments/CDATA/script/style/textarea/title, data: classification, cp1251/
   UTF-16/BOM, unclosed markup fail-closed),
   extension-first routing, PDF `.pdf`/unknown-extension routing, response-MIME priority,
   binary `.txt` sniff, download body-probe trust, TXT mixed EOL.
