@@ -96,6 +96,11 @@ export {
   restoreDocx,
 } from './formats/docx';
 export {
+  anonymizeHtml,
+  htmlFormatAdapter,
+  restoreHtml,
+} from './formats/html';
+export {
   anonymizeJson,
   type JsonMode,
   jsonFormatAdapter,

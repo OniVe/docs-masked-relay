@@ -317,7 +317,8 @@ function fingerprintBytes(bytes: Uint8Array): number {
 
 function isTextualEntry(entry: MaskedUpload): boolean {
   return (
-    entry.mime.toLowerCase().startsWith('text/') || /\.(txt|md|csv|json|xml)$/iu.test(entry.name)
+    entry.mime.toLowerCase().startsWith('text/') ||
+    /\.(txt|md|csv|json|xml|html|htm)$/iu.test(entry.name)
   );
 }
 

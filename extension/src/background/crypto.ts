@@ -46,6 +46,7 @@ const FILE_FORMATS: ReadonlySet<FileFormat> = new Set<FileFormat>([
   'xls',
   'json',
   'xml',
+  'html',
 ]);
 
 export type MasterKeyKind = 'device' | 'passphrase';

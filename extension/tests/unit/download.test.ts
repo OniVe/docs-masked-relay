@@ -183,6 +183,8 @@ describe('download URL classification', () => {
     expect(fileNameFromMime('application/jsonl')).toBe('download.jsonl');
     expect(fileNameFromMime('application/xml')).toBe('download.xml');
     expect(fileNameFromMime('text/xml')).toBe('download.xml');
+    expect(fileNameFromMime('text/html')).toBe('download.html');
+    expect(fileNameFromMime('application/xhtml+xml')).toBe('download.html');
     expect(fileNameFromMime('image/png')).toBeUndefined();
   });
 });

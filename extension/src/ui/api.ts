@@ -33,7 +33,7 @@ export const ERROR_TEXT: Record<RelayFailureCode | 'NO_RESPONSE', string> = {
   LIMIT:
     'Файл больше лимита. Увеличьте лимит в настройках или выберите файл меньше — файл не отправлен.',
   UNSUPPORTED:
-    'Формат не поддерживается. Сохраните файл как DOCX, XLSX, TXT, MD, JSON, XML или PDF.',
+    'Формат не поддерживается. Сохраните файл как DOCX, XLSX, TXT, MD, JSON, XML, HTML или PDF.',
   UNSUPPORTED_ARCHIVE:
     'Архив ZIP64 или зашифрованный ZIP не поддерживается. Пересохраните файл как обычный DOCX или XLSX.',
   TOO_MANY_ENTITIES:
@@ -145,6 +145,7 @@ export function mimeForName(name: string, fallback: string): string {
   if (/\.(?:jsonl|ndjson)$/iu.test(name)) return 'application/x-ndjson';
   if (/\.json$/iu.test(name)) return 'application/json';
   if (/\.xml$/iu.test(name)) return 'application/xml';
+  if (/\.(?:html|htm)$/iu.test(name)) return 'text/html';
   if (/\.docx$/iu.test(name)) {
     return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
   }

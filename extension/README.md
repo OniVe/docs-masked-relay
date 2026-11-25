@@ -64,7 +64,7 @@ DocsMasked Relay — расширение для браузера, которо�
 | Перехват выключен          | Файлы проходят без обработки, перезагружать вкладку не нужно                                                                                     |
 | Ручной режим               | В окне расширения можно нажать «Анонимизировать» или «Восстановить» для выбранного файла                                                         |
 
-Форматы: DOCX, XLSX, TXT, MD, JSON и построчный JSON (JSONL), XML, PDF, а также старые
+Форматы: DOCX, XLSX, TXT, MD, JSON и построчный JSON (JSONL), XML, HTML, PDF, а также старые
 форматы DOC/XLS.
 
 ## Требования
@@ -181,7 +181,8 @@ DM_CHROMIUM_BINARY="C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe
   Проверка утечек снижает риск, но не устраняет его.
 - Некоторые структуры отклоняются целиком, если их нельзя обезличить безопасно: числовые
   значения с признаками персональных данных в JSON, XML с DOCTYPE/DTD или неизвестными
-  сущностями, повреждённые архивы. Это безопасный отказ, а не утечка.
+  сущностями, HTML с незакрытыми комментариями/кавычками/raw-text-блоками, повреждённые
+  архивы. Это безопасный отказ, а не утечка.
 - Протокол chatgpt.com может измениться; запасной вариант — ручной режим.
 - Safari: автоматический перехват работает в desktop Safari 18+; iOS не поддерживается.
 - Лимит по умолчанию — 25 МБ (до 100 МБ), PDF — до 200 страниц. Большие файлы
@@ -247,13 +248,25 @@ DM_CHROMIUM_BINARY="C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe
   охвата), обычные атрибуты покрыты, userinfo/path в прозе заменяются. Двоичный `.txt` с
   printable-префиксом может пройти sniff; MD со смешанными переводами строк не
   перенормализуется. Лимиты: глубина 200, 1M узлов.
+- **HTML.** Толерантный сканер без внешних зависимостей: текст между разметкой, значения
+  атрибутов, комментарии, CDATA и содержимое `script`/`style`/`textarea`/`title`
+  заменяются метками; теги, имена атрибутов, DOCTYPE и форматирование сохраняются.
+  Кавычки и `>` внутри значений учитываются, `<` внутри raw-text-блоков не парсится как
+  разметка. Незакрытые комментарии, CDATA, кавычки и raw-text-блоки отклоняют файл;
+  одиночный диапазон больше 4 МиБ и больше 1 000 000 диапазонов — тоже. Значения
+  `src`/`href`, начинающиеся с `data:`, пропускаются с предупреждением: двоичный payload
+  не сканируется. Сущности не декодируются перед детекцией (имя, разделённое `&nbsp;`,
+  может остаться незамеченным — принятое ограничение). Исходная кодировка/BOM и
+  `<meta charset>` не переписываются; восстановление возвращает исходные байты.
 - **Типы файлов и маршрутизация.** Расширение важнее MIME (`.xml` + `application/json` —
-  XML, `.json` + `text/markdown` — JSON); PDF — только `.pdf` или неизвестное расширение +
-  `application/pdf`; обезличенный MIME — `application/json`/`application/x-ndjson`/
-  `application/xml` (`text/xml` при `text/xml` на входе). Для скачивания без имени
-  `application/json`/NDJSON/XML дают `download.json`/`download.jsonl`/`download.xml`.
+  XML, `.json` + `text/markdown` — JSON, `.html` + `application/json` — HTML); PDF —
+  только `.pdf` или неизвестное расширение + `application/pdf`; обезличенный MIME —
+  `application/json`/`application/x-ndjson`/`application/xml` (`text/xml` при
+  `text/xml` на входе), для HTML — `text/html` или `application/xhtml+xml`, если он был
+  на входе. Для скачивания без имени `application/json`/NDJSON/XML/HTML дают
+  `download.json`/`download.jsonl`/`download.xml`/`download.html`.
   При восстановлении приоритет у текстового content-type, метаданные — запасной вариант;
-  двоичный `.txt/.md/.json/.xml` с меткой требует printable/UTF-8 sniff и иначе не
+  двоичный `.txt/.md/.json/.xml/.html` с меткой требует printable/UTF-8 sniff и иначе не
   восстанавливается. TXT сохраняет смешанные переводы строк побайтово.
 - **DOCX/XLSX.** Сложные документы (SmartArt, встроенные объекты, редкие структуры) могут
   проверяться не полностью; ошибка разбора приводит к безопасному отказу.
@@ -307,10 +320,12 @@ PDF обрабатывается в background page. Требуется Safari 1
   проверка утечек длинных цифр), XML (namespaces/CDATA/attrs/comments/PI/DTD/UTF-16/1251,
   `xml:*`-значения и URI path/lone id, structural allowlist/Latin, xml:lang/space
   validation, role-aware name-элементы/атрибуты, declaration label, mixed EOL),
+  HTML (text/attrs/comments/CDATA/script/style/textarea/title, data: skip, cp1251/
+  UTF-16/BOM, unclosed markup fail-closed),
   extension-first routing, PDF `.pdf`/unknown-extension routing, response-MIME priority,
   binary `.txt` sniff, download body-probe trust, TXT mixed EOL.
 - E2E: mock chatgpt.com + unpacked extension; upload/download/PDF; options persistence;
-  popup toggle; lock/unlock; export/import UI; clear data. JSON/XML e2e в M8 не
+  popup toggle; lock/unlock; export/import UI; clear data. JSON/XML/HTML e2e в M8 не
   запускался (ограничение окружения Windows) — покрытие этих форматов unit/static.
 - E2E никогда не обращается к живому ChatGPT.
 - Harness fail-not-skip (H3): отсутствие сборки/манифеста или падение запуска Chromium

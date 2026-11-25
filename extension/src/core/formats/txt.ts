@@ -474,6 +474,7 @@ export function formatClassOf(format: string): FormatClass {
     case 'md':
     case 'json':
     case 'xml':
+    case 'html':
       return 'text';
     case 'pdf':
       return 'pdf';

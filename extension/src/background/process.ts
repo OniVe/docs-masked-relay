@@ -19,6 +19,7 @@ import {
   docxFormatAdapter,
   type FileFormat,
   type FormatAdapter,
+  htmlFormatAdapter,
   IdentityMismatchVaultFileError,
   jsonFormatAdapter,
   type MaskedEntity,
@@ -90,6 +91,7 @@ const FORMAT_ADAPTERS: readonly FormatAdapter[] = [
   mdFormatAdapter,
   jsonFormatAdapter,
   xmlFormatAdapter,
+  htmlFormatAdapter,
   txtFormatAdapter,
 ];
 
@@ -103,6 +105,7 @@ const STANDARD_MIME: Partial<Record<FileFormat, string>> = {
   md: 'text/markdown',
   json: 'application/json',
   xml: 'application/xml',
+  html: 'text/html',
 };
 
 /**

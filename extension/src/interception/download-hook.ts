@@ -135,10 +135,12 @@ const TEXTUAL_MIME = new Set([
   'application/jsonl',
   'application/xml',
   'text/xml',
+  'application/xhtml+xml',
 ]);
 
 /** Extensions whose bytes this extension can restore offline. */
-const RESTORE_EXTENSION_RE = /\.(?:txt|md|markdown|json|jsonl|ndjson|xml|docx|xlsx|doc|xls)$/iu;
+const RESTORE_EXTENSION_RE =
+  /\.(?:txt|md|markdown|json|jsonl|ndjson|xml|html|htm|docx|xlsx|doc|xls)$/iu;
 
 const RESTORE_MIME = new Set([
   'text/plain',
@@ -151,6 +153,8 @@ const RESTORE_MIME = new Set([
   'application/jsonl',
   'application/xml',
   'text/xml',
+  'application/xhtml+xml',
+  'text/html',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   'application/msword',
@@ -211,10 +215,10 @@ function isRestoreTarget(name: string, responseMime: string): boolean {
 }
 
 /** Text-format names whose buffered bytes must look textual before restore. */
-const TEXT_RESTORE_NAME_RE = /\.(?:txt|md|markdown|json|jsonl|ndjson|xml)$/iu;
+const TEXT_RESTORE_NAME_RE = /\.(?:txt|md|markdown|json|jsonl|ndjson|xml|html|htm)$/iu;
 
 /**
- * A binary body behind a `.txt`/`.json`/`.xml` name must not reach the
+ * A binary body behind a `.txt`/`.json`/`.xml`/`.html` name must not reach the
  * restore bridge: accept it only with a textual response MIME or a printable
  * UTF-8 sniff. OOXML/legacy office files are binary by design and are not
  * subject to this gate (M8-N2).
@@ -327,6 +331,9 @@ export function fileNameFromMime(mime: string): string | undefined {
     case 'application/xml':
     case 'text/xml':
       return 'download.xml';
+    case 'text/html':
+    case 'application/xhtml+xml':
+      return 'download.html';
     case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
       return 'download.docx';
     case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':

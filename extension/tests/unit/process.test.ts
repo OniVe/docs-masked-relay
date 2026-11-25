@@ -558,6 +558,9 @@ describe('M8: extension-first routing and masked MIME', () => {
     expect(selectFormatAdapter('data.xml', 'text/markdown')?.format).toBe('xml');
     expect(selectFormatAdapter('data.xml', 'text/plain')?.format).toBe('xml');
     expect(selectFormatAdapter('notes.md', 'text/plain')?.format).toBe('md');
+    expect(selectFormatAdapter('page.html', 'text/html')?.format).toBe('html');
+    expect(selectFormatAdapter('page.htm', 'application/xhtml+xml')?.format).toBe('html');
+    expect(selectFormatAdapter('page.html', 'application/json')?.format).toBe('html');
     expect(selectFormatAdapter('a.data', 'application/json')?.format).toBe('json');
   });
 

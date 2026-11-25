@@ -21,6 +21,7 @@ const EXPECTED_CLASSES: readonly (readonly [FileFormat, FormatClass])[] = [
   ['md', 'text'],
   ['json', 'text'],
   ['xml', 'text'],
+  ['html', 'text'],
   ['docx', 'word'],
   ['doc', 'word'],
   ['xlsx', 'sheet'],
@@ -57,7 +58,7 @@ describe('R21-N1: formatClassOf covers every FileFormat', () => {
   it('has exactly one mapping per persisted format and four classes', () => {
     const formats = EXPECTED_CLASSES.map(([format]) => format);
     expect([...formats].sort()).toEqual(
-      ['txt', 'md', 'json', 'xml', 'docx', 'doc', 'xlsx', 'xls', 'pdf'].sort(),
+      ['txt', 'md', 'json', 'xml', 'html', 'docx', 'doc', 'xlsx', 'xls', 'pdf'].sort(),
     );
     const classes = new Set(EXPECTED_CLASSES.map(([, formatClass]) => formatClass));
     expect([...classes].sort()).toEqual(['pdf', 'sheet', 'text', 'word']);

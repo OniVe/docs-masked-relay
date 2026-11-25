@@ -67,7 +67,17 @@ export const ALL_LABELS: readonly EntityLabel[] = [
   'CUSTOM',
 ];
 
-export type FileFormat = 'docx' | 'xlsx' | 'txt' | 'md' | 'pdf' | 'doc' | 'xls' | 'json' | 'xml';
+export type FileFormat =
+  | 'docx'
+  | 'xlsx'
+  | 'txt'
+  | 'md'
+  | 'pdf'
+  | 'doc'
+  | 'xls'
+  | 'json'
+  | 'xml'
+  | 'html';
 
 /** Dominant line ending of a text file. */
 export type Eol = 'lf' | 'crlf' | 'cr';
