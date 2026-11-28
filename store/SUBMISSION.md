@@ -1,9 +1,10 @@
 # Store submission checklist — Chrome Web Store / Microsoft Edge Add-ons
 
-Version 0.2.2 submitted for review on 2026-11-25. 0.2.1 published in Chrome Web Store on
-2026-11-25; 0.2.0 published on 2026-11-24 and is superseded. Microsoft Edge Add-ons was not
-submitted. See the status section below. The checklist documents the preparation and remaining
-external actions of the project owner.
+Version 0.2.2 was published in the Chrome Web Store on 2026-11-25 (public listing updated
+2026-11-25). 0.2.1 was published on 2026-11-25 and is superseded; 0.2.0 was published on
+2026-11-24 and is also superseded. Microsoft Edge Add-ons was not submitted. See the status
+section below. The checklist documents the preparation and remaining external actions of
+the project owner.
 
 ## Update 0.2.2 (2026-11-25)
 
@@ -17,8 +18,10 @@ external actions of the project owner.
   percent-encoded, PDF and office payloads are rejected.
 - **Package**: `store/packages/DocsMaskedRelay-0.2.2-chrome-webstore.zip`
   (built from `extension/` as `.output/docs-masked-relay-0.2.2-chrome.zip`).
-- **Status**: submitted for review on 2026-11-25; dashboard status: `Ожидает рассмотрения`
-  (draft version 0.2.2; published version remains 0.2.1 until review completes).
+- **Status**: **published**. The public Chrome Web Store listing showed version 0.2.2 with
+  "updated 2026-11-25". The dashboard status check on 2026-11-28 timed out, so the
+  public-listing observation is the evidence of record: version 0.2.2 is served to users.
+  Earlier dashboard state was `Ожидает рассмотрения` (draft 0.2.2; published 0.2.1).
 
 Current package facts are recorded in `store/packages/README.md`.
 
@@ -34,12 +37,14 @@ Current package facts are recorded in `store/packages/README.md`.
 - **Status**: **published on 2026-11-25** for all users; dashboard status
   `Опубликовано - для всех`. 0.2.0 is superseded.
 
-## Submission status (2026-11-24)
+## Submission status (updated 2026-11-28)
 
 - **Chrome Web Store**: **published**. Public URL:
   <https://chromewebstore.google.com/detail/docsmasked-relay/iieopopifchankeeciiekichbcfdbdnl>.
   Item ID: `iieopopifchankeeciiekichbcfdbdnl`. Version 0.2.0 published on 2026-11-24;
-  version 0.2.1 published for all users on 2026-11-25 (0.2.0 superseded).
+  version 0.2.1 published for all users on 2026-11-25; version 0.2.2 published on
+  2026-11-25 per the public listing (0.2.0 and 0.2.1 superseded). The dashboard status
+  check on 2026-11-28 timed out; the public listing is the evidence used here.
 - **History**: the first submission (2026-11-23) was rejected under **Yellow Argon**
   («Избыточные ключевые слова в описании продукта») because the description contained a
   long list of file-format keywords. The formats sentence was rewritten as prose in
@@ -178,7 +183,7 @@ Deferred / external:
 - [ ] Store accounts, 2FA and fee (owner).
 - [ ] Hosting and public privacy-policy URL (owner).
 - [ ] Support contact (`[PUBLIC CONTACT]`) and website/support URL (owner).
-- [x] Chrome Web Store upload, review, and publish — published 2026-11-24.
+- [x] Chrome Web Store upload, review, and publish — 0.2.2 published 2026-11-25.
 - [ ] Microsoft Edge Add-ons submission and certification.
 - [ ] Safari/macOS track: Xcode wrapper, signing, notarization, App Store — separate track,
       not part of this package.

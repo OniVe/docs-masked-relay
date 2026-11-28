@@ -47,6 +47,7 @@
       </ul>
     </li>
     <li><a href="#использование">Использование</a></li>
+    <li><a href="#материалы">Материалы</a></li>
     <li><a href="#планы">Планы</a></li>
     <li><a href="#участие">Участие</a></li>
     <li><a href="#лицензия">Лицензия</a></li>
@@ -158,6 +159,20 @@ Windows-учётной записи.
 
 Подробности: [extension/README.md](extension/README.md), [PRIVACY.md](extension/PRIVACY.md),
 [SECURITY.md](extension/SECURITY.md).
+
+<p align="right">(<a href="#readme-top">наверх</a>)</p>
+
+<!-- MATERIALS -->
+<a id="материалы"></a>
+## Материалы
+
+* [Лендинг для специалистов](store/ru.html) — кому подходит, как работает, форматы и
+  ограничения.
+* [Проверка локальности](store/verify.html) — байт-точное восстановление, проверка
+  отсутствия сети в DevTools, разрешения и модель угроз.
+
+Страницы статические: без JavaScript, аналитики и внешних ресурсов. PDF редактируется
+необратимо: восстановить исходный PDF нельзя.
 
 <p align="right">(<a href="#readme-top">наверх</a>)</p>
 

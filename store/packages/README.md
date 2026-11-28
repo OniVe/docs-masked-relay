@@ -29,7 +29,7 @@ sha256sum -c SHA256SUMS
 
 | Версия | Файл | Размер | SHA256 | Статус |
 | --- | --- | --- | --- | --- |
-| 0.2.2 | `DocsMaskedRelay-0.2.2-chrome-webstore.zip` | 5 996 396 байт | `aa81f1d5281a3906f2e0a58ab915f317c56db77c69e9192f32509349ce364428` | подготовлен к отправке |
+| 0.2.2 | `DocsMaskedRelay-0.2.2-chrome-webstore.zip` | 5 996 396 байт | `aa81f1d5281a3906f2e0a58ab915f317c56db77c69e9192f32509349ce364428` | опубликован 2026-11-25 |
 | 0.2.1 | `DocsMaskedRelay-0.2.1-chrome-webstore.zip` | 5 994 373 байт | `aa70edb0c7c60353f6e9638a2c712e28939fbec54e6d1b03fd2e590bd009c6db` | опубликован 2026-11-25 |
 | 0.2.0 | `DocsMaskedRelay-0.2.0-chrome-webstore.zip` | 5 993 985 байт | `6ff5fd9da50cbd068e35e6aa95eb084d22ddebfd17a69626fe70189852f385a1` | опубликован 2026-11-24, заменён 0.2.1 |
 

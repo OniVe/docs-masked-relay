@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Проверка DocsMasked Relay: что значит байт-точное восстановление, какие форматы обратимы, как убедиться в отсутствии сетевых запросов в ручном режиме, какие разрешения запрашивает расширение и какие у него ограничения."
+    />
+    <title>DocsMasked Relay — проверка восстановления и локальности</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #ffffff;
+        --fg: #1c1e21;
+        --muted: #5b6169;
+        --accent: #1f6feb;
+        --rule: #dfe3e8;
+        --panel: #f6f8fa;
+        --warn: #9a6700;
+        --warn-bg: #fff8e5;
+        --ok: #1a7f37;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #121417;
+          --fg: #e6e8eb;
+          --muted: #a1a8b2;
+          --accent: #6ea8fe;
+          --rule: #2c3138;
+          --panel: #1a1d21;
+          --warn: #e3b341;
+          --warn-bg: #2a2313;
+          --ok: #56d364;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font: 16px/1.65 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      }
+      main {
+        max-width: 56rem;
+        margin: 0 auto;
+        padding: 0 1.25rem 4rem;
+      }
+      a {
+        color: var(--accent);
+      }
+      .topbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem 1.25rem;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--rule);
+      }
+      .brand {
+        font-weight: 700;
+        text-decoration: none;
+        color: var(--fg);
+      }
+      .brand span {
+        color: var(--accent);
+      }
+      .topbar nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 1rem;
+        font-size: 0.92rem;
+      }
+      .topbar nav a {
+        text-decoration: none;
+      }
+      .hero {
+        padding: 2.6rem 0 0.4rem;
+      }
+      h1 {
+        font-size: clamp(1.8rem, 5vw, 2.6rem);
+        line-height: 1.18;
+        letter-spacing: -0.015em;
+        margin: 0 0 0.75rem;
+      }
+      .lede {
+        color: var(--muted);
+        font-size: 1.05rem;
+        margin: 0;
+      }
+      section {
+        margin: 2.6rem 0 0;
+      }
+      h2 {
+        font-size: clamp(1.3rem, 3vw, 1.6rem);
+        line-height: 1.25;
+        margin: 0 0 0.6rem;
+        padding-top: 1.4rem;
+        border-top: 1px solid var(--rule);
+      }
+      h3 {
+        font-size: 1.02rem;
+        margin: 1.2rem 0 0.35rem;
+      }
+      p,
+      li {
+        margin: 0.55rem 0;
+      }
+      ul,
+      ol {
+        padding-left: 1.4rem;
+      }
+      .callout {
+        background: var(--panel);
+        border-left: 4px solid var(--accent);
+        padding: 0.9rem 1.1rem;
+        margin: 1.2rem 0;
+        border-radius: 0 8px 8px 0;
+      }
+      .callout strong {
+        display: block;
+        margin-bottom: 0.3rem;
+      }
+      .callout.warn {
+        border-left-color: var(--warn);
+        background: var(--warn-bg);
+      }
+      .callout.warn strong {
+        color: var(--warn);
+      }
+      .table-wrap {
+        overflow-x: auto;
+        margin: 1rem 0 0;
+        border: 1px solid var(--rule);
+        border-radius: 10px;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        min-width: 38rem;
+        font-size: 0.93rem;
+      }
+      th,
+      td {
+        border-bottom: 1px solid var(--rule);
+        padding: 0.6rem 0.75rem;
+        text-align: left;
+        vertical-align: top;
+      }
+      tr:last-child td {
+        border-bottom: 0;
+      }
+      th {
+        background: var(--panel);
+      }
+      code {
+        font: 0.9em ui-monospace, SFMono-Regular, Consolas, monospace;
+        background: var(--panel);
+        padding: 0.1em 0.3em;
+        border-radius: 4px;
+        overflow-wrap: anywhere;
+      }
+      pre {
+        background: var(--panel);
+        border: 1px solid var(--rule);
+        border-radius: 10px;
+        padding: 0.9rem 1rem;
+        overflow-x: auto;
+        font: 0.88rem/1.55 ui-monospace, SFMono-Regular, Consolas, monospace;
+      }
+      pre code {
+        background: none;
+        padding: 0;
+      }
+      .checklist {
+        list-style: none;
+        padding-left: 0;
+      }
+      .checklist li {
+        padding-left: 1.6rem;
+        position: relative;
+      }
+      .checklist li::before {
+        content: "✓";
+        position: absolute;
+        left: 0;
+        color: var(--ok);
+        font-weight: 700;
+      }
+      .links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem 1.1rem;
+        margin-top: 1rem;
+      }
+      footer {
+        margin-top: 3rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--rule);
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+      footer p {
+        margin: 0.35rem 0;
+      }
+      @media (max-width: 640px) {
+        main {
+          padding: 0 1rem 3rem;
+        }
+        h1 {
+          font-size: 1.75rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header class="topbar">
+        <a class="brand" href="./ru.html">DocsMasked <span>Relay</span></a>
+        <nav aria-label="Разделы страницы">
+          <a href="#roundtrip">Восстановление</a>
+          <a href="#network">Проверка сети</a>
+          <a href="#permissions">Разрешения</a>
+          <a href="#threat-model">Ограничения</a>
+          <a href="./ru.html">На главную</a>
+        </nav>
+      </header>
+
+      <div class="hero">
+        <h1>Проверка: байт-точное восстановление и отсутствие сети</h1>
+        <p class="lede">
+          Эта страница объясняет, что именно обещает DocsMasked Relay, как проверить
+          локальность ручного режима в DevTools, какие разрешения запрашивает расширение и
+          где заканчиваются его гарантии.
+        </p>
+      </div>
+
+      <section id="roundtrip">
+        <h2>1. Что мы называем байт-точным восстановлением</h2>
+        <p>
+          «Байт-точный» здесь означает не «любой файл после любого редактирования», а
+          конкретное свойство: расширение не перерисовывает документ и не прогоняет его
+          через сторонний редактор. Оно вставляет замены в исходный поток байтов, а при
+          восстановлении возвращает исходные значения в те же места. Байты вне замен не
+          переписываются: кодировка, BOM, переводы строк, пробелы, отступы, структурные
+          ключи и разметка остаются прежними. Если ключ сам содержит PII (например, email),
+          он может быть замаскирован — это замена значения, а не потеря структуры.
+        </p>
+        <div class="callout">
+          <strong>Короткая формула</strong>
+          Меняются только участки, распознанные как персональные данные: значения, а
+          также ключи, если ключ сам содержит PII. Всё остальное — структура,
+          форматирование и служебные байты — сохраняется. Если файл после обезличивания
+          отредактировать вручную, восстановление не обязано вернуть исходник: при
+          несовпадении хеша расширение отказывается угадывать.
+        </div>
+        <p>
+          Для текстовых и структурированных форматов (TXT, MD, JSON/JSONL, XML, HTML)
+          восстановление возвращает исходные значения и байты в исходной кодировке; для
+          TXT и MD смешанные переводы строк сохраняются побайтово. Для DOCX и XLSX
+          восстанавливаются текстовые значения, структура и вёрстка, но ZIP-контейнер
+          может быть пересобран, поэтому побайтовое совпадение всего файла не
+          заявляется. Для PDF восстановления нет по замыслу: это односторонняя редакция.
+        </p>
+
+        <h3>Форматы и обратимость</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Формат</th>
+                <th>Что происходит</th>
+                <th>Обратимость</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>TXT, MD</td>
+                <td>
+                  Замена в тексте с сохранением кодировки, BOM и переводов строк; метки
+                  можно вернуть.
+                </td>
+                <td>Да, побайтово для неизменённого обезличенного файла.</td>
+              </tr>
+              <tr>
+                <td>JSON, JSONL</td>
+                <td>
+                  Заменяются строковые значения, а также ключи, если ключ сам содержит PII;
+                  числа, отступы и экранирование не переписываются. Числовые ПДн (ИНН,
+                  СНИЛС, карта, счёт, телефон) отклоняются, а не заменяются.
+                </td>
+                <td>
+                  Да для строк; байты вне замен сохраняются. Небезопасная структура
+                  отклоняется целиком.
+                </td>
+              </tr>
+              <tr>
+                <td>XML</td>
+                <td>
+                  Текст, CDATA и значения атрибутов; имена элементов и атрибутов, DOCTYPE
+                  и namespace-объявления структурны. Комментарии и processing
+                  instructions — односторонние.
+                </td>
+                <td>
+                  Да для текста и атрибутов; комментарии/PI не восстанавливаются. DTD и
+                  неизвестные сущности отклоняются.
+                </td>
+              </tr>
+              <tr>
+                <td>HTML</td>
+                <td>
+                  Текст, значения атрибутов, комментарии, CDATA и содержимое
+                  script/style/textarea/title; теги и имена атрибутов сохраняются.
+                </td>
+                <td>
+                  Да для обработанных узлов; незакрытая разметка и небезопасные
+                  <code>data:</code>-URI отклоняются.
+                </td>
+              </tr>
+              <tr>
+                <td>DOCX, XLSX</td>
+                <td>
+                  Прямая правка OOXML: текст, колонтитулы, примечания, скрытые листы и
+                  другие поддерживаемые части; метаданные санируются.
+                </td>
+                <td>
+                  Значения и вёрстка — да; побайтовое совпадение ZIP-контейнера не
+                  гарантируется. Изображения и встроенные объекты не сканируются.
+                </td>
+              </tr>
+              <tr>
+                <td>DOC, XLS (legacy)</td>
+                <td>
+                  Конвертация в DOCX/XLSX, затем обработка. Сложная вёрстка, стили,
+                  формулы и макросы могут потеряться.
+                </td>
+                <td>Только текст/значения; исходный формат не возвращается.</td>
+              </tr>
+              <tr>
+                <td>PDF</td>
+                <td>
+                  Необратимое удаление (redaction) найденных данных; метаданные и
+                  вложения санируются. Сканы без текстового слоя блокируются.
+                </td>
+                <td>
+                  <strong>Нет.</strong> Восстановить исходный PDF после redaction нельзя.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout warn">
+          <strong>Не путайте «восстановление значений» с «отменой редактирования»</strong>
+          Если вы скачали обезличенный PDF, изменили его или удалили хранилище, исходные
+          данные вернуть не получится. Для PDF расширение специально не хранит
+          возможность обратной операции.
+        </div>
+      </section>
+
+      <section id="network">
+        <h2>2. Как проверить отсутствие сети в ручном режиме</h2>
+        <p>
+          Ручной режим обрабатывает выбранный файл внутри расширения и сохраняет результат
+          через локальную ссылку на blob. Проверка ниже показывает, что в этом сценарии
+          расширение не обращается к серверу разработчика или аналитике. Используйте
+          только синтетический файл — без реальных персональных данных.
+        </p>
+        <h3>Подготовка</h3>
+        <ol>
+          <li>
+            Создайте текстовый файл с вымышленными данными, например:
+            <pre><code>Иванов Иван Иванович
++7 999 123-45-67
+ivan.ivanov@example.com</code></pre>
+          </li>
+          <li>
+            Откройте <code>chrome://extensions</code> (или <code>edge://extensions</code>),
+            включите режим разработчика и найдите DocsMasked Relay.
+          </li>
+          <li>
+            У расширения нажмите ссылку <strong>«Service worker»</strong> /
+            <strong>«Inspect views»</strong>, чтобы открыть DevTools фоновой части.
+          </li>
+        </ol>
+        <h3>Замер</h3>
+        <ol>
+          <li>В DevTools откройте вкладку <strong>Network</strong>.</li>
+          <li>
+            Включите <strong>Preserve log</strong>, нажмите <strong>Clear</strong>, чтобы
+            начать с пустого журнала.
+          </li>
+          <li>
+            Откройте окно расширения → <strong>Ручной режим</strong> →
+            <strong>Анонимизировать файл</strong>, выберите синтетический файл и нажмите
+            <strong>Анонимизировать и скачать</strong>.
+          </li>
+          <li>
+            Затем выберите скачанный обезличенный файл в разделе
+            <strong>Восстановить файл</strong> и нажмите
+            <strong>Восстановить и скачать</strong>.
+          </li>
+          <li>
+            Вернитесь в DevTools. В журнале не должно быть внешних запросов к
+            <code>chatgpt.com</code>, <code>oaiusercontent.com</code>, CDN, аналитике или
+            серверу разработчика. Локальные ресурсы расширения и сохранение blob не
+            являются сетевой передачей.
+          </li>
+        </ol>
+        <p>
+          Для PDF, если в Inspect views виден offscreen-документ, откройте DevTools и его:
+          сетевых запросов там также быть не должно.
+        </p>
+        <div class="callout">
+          <strong>Что будет видно при автоматическом режиме</strong>
+          Если вы пользуетесь ChatGPT, браузер сам отправляет запросы на
+          <code>chatgpt.com</code>, а расширение — только обезличенный файл на
+          <code>*.oaiusercontent.com</code> при загрузке. Это ожидаемая передача в ChatGPT,
+          а не телеметрия расширения. В ручном режиме ChatGPT не участвует.
+        </div>
+        <p>
+          Если нужен независимый журнал всего браузера, используйте
+          <code>chrome://net-export</code>: включите запись, выполните ручной цикл,
+          остановите запись и проверьте, что в захвате нет внешних запросов, инициированных
+          расширением. Учтите, что сам браузер может обращаться к своим службам — смотрите
+          на источник запроса, а не только на факт запроса.
+        </p>
+      </section>
+
+      <section id="permissions">
+        <h2>3. Разрешения и зачем они нужны</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Разрешение / доступ</th>
+                <th>Назначение</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>storage</code></td>
+                <td>Настройки расширения и служебные флаги; синхронизации нет.</td>
+              </tr>
+              <tr>
+                <td><code>unlimitedStorage</code></td>
+                <td>
+                  Зашифрованное хранилище в IndexedDB: соответствий может быть много, а
+                  стандартной квоты не хватает.
+                </td>
+              </tr>
+              <tr>
+                <td><code>offscreen</code> (Chrome/Edge)</td>
+                <td>
+                  Служебная страница только для обработки PDF (PDFium/WebAssembly). Она
+                  не имеет интерфейса и не делает сетевых запросов.
+                </td>
+              </tr>
+              <tr>
+                <td><code>https://chatgpt.com/*</code></td>
+                <td>Перехват загрузки и скачивания файлов на странице ChatGPT.</td>
+              </tr>
+              <tr>
+                <td><code>https://chat.openai.com/*</code></td>
+                <td>То же для старого адреса ChatGPT.</td>
+              </tr>
+              <tr>
+                <td><code>https://*.oaiusercontent.com/*</code></td>
+                <td>
+                  Передача и получение байтов по подписанным ссылкам OpenAI/Azure.
+                </td>
+              </tr>
+              <tr>
+                <td>Скрипты на страницах</td>
+                <td>
+                  Только на перечисленных доменах: перехват файлов и связь со страницей.
+                  Другие сайты расширение не читает.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Расширение не запрашивает <code>tabs</code>, <code>downloads</code>,
+          <code>debugger</code>, <code>scripting</code>, <code>cookies</code>,
+          <code>history</code> или <code>&lt;all_urls&gt;</code>. Разрешение
+          <code>downloads</code> намеренно не используется: результат ручного режима
+          сохраняется через ссылку на blob. Удалённого кода нет: WebAssembly-модули входят
+          в пакет.
+        </p>
+      </section>
+
+      <section id="threat-model">
+        <h2>4. Модель угроз и ограничения</h2>
+        <p>
+          Расширение снижает риск случайной отправки лишних персональных данных в ChatGPT.
+          Оно не является средством защиты от всех утечек и не даёт юридических гарантий.
+        </p>
+        <ul>
+          <li>
+            <strong>Нет OCR.</strong> Сканы PDF без текстового слоя блокируются; текст на
+            изображениях не распознаётся.
+          </li>
+          <li>
+            <strong>Изображения и встроенные объекты.</strong> Картинки, диаграммы,
+            вложения и embedded-объекты внутри документов не сканируются.
+          </li>
+          <li>
+            <strong>Эвристики вероятностны.</strong> Возможны пропуски (false negatives) и
+            лишние замены (false positives). LeakGuard снижает риск, но не устраняет его.
+          </li>
+          <li>
+            <strong>Структуры с отказом.</strong> Небезопасные JSON/XML/HTML, DTD,
+            неизвестные сущности, незакрытая разметка и некоторые <code>data:</code>-URI
+            отклоняются целиком (fail-closed), а не обрабатываются частично.
+          </li>
+          <li>
+            <strong>Компрометация окружения.</strong> Взлом операционной системы, браузера,
+            профиля, других расширений или страницы ChatGPT не покрывается моделью угроз.
+            Скрипт страницы работает в том же источнике и технически может инициировать
+            восстановление по известному коду хранилища (restore-oracle); это не защита от
+            скомпрометированной страницы. Подробнее — <code>SECURITY.md</code>.
+          </li>
+          <li>
+            <strong>OpenAI.</strong> После отправки обезличенный файл хранится у OpenAI по
+            её правилам. Расширение не управляет сроком хранения, обучением моделей или
+            доступом со стороны OpenAI.
+          </li>
+          <li>
+            <strong>PDF.</strong> Редакция необратима; восстановить исходный PDF нельзя.
+            Сканы без текстового слоя блокируются.
+          </li>
+          <li>
+            <strong>Legacy.</strong> DOC/XLS конвертируются в DOCX/XLSX; сложная вёрстка,
+            стили, формулы и макросы могут потеряться.
+          </li>
+          <li>
+            <strong>Не юридическая гарантия.</strong> Расширение помогает снизить риск, но
+            не сертифицирует соответствие 152-ФЗ, GDPR или иным требованиям. Решение о
+            допустимости отправки данных остаётся за пользователем и организацией.
+          </li>
+        </ul>
+        <div class="callout warn">
+          <strong>Что доказывает проверка, а что нет</strong>
+          Проверка в DevTools показывает, что ручной режим не делает внешних запросов в
+          вашем окружении. Она не доказывает полноту детекторов, безопасность браузера,
+          отсутствие ошибок в сторонних компонентах и то, как OpenAI обрабатывает
+          загруженный файл. Для чувствительных данных используйте синтетические или
+          минимизированные наборы и проверяйте результат перед отправкой.
+        </div>
+      </section>
+
+      <section id="links">
+        <h2>Ссылки</h2>
+        <div class="links">
+          <a href="./ru.html">Лендинг для специалистов</a>
+          <a href="./privacy-policy.html">Политика конфиденциальности</a>
+          <a href="https://github.com/OniVe/docs-masked-relay">GitHub</a>
+          <a href="https://github.com/OniVe/docs-masked-relay/blob/main/SECURITY.md"
+            >SECURITY.md</a
+          >
+          <a
+            href="https://chromewebstore.google.com/detail/docsmasked-relay/iieopopifchankeeciiekichbcfdbdnl"
+            >Chrome Web Store</a
+          >
+        </div>
+      </section>
+
+      <footer>
+        <p>
+          DocsMasked Relay · проверка локальности и восстановления · версия расширения 0.2.2.
+        </p>
+        <p>
+          На этой странице нет cookies, скриптов, аналитики и внешних ресурсов. Все
+          примеры данных вымышлены.
+        </p>
+      </footer>
+    </main>
+  </body>
+</html>

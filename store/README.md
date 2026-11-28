@@ -9,6 +9,8 @@ public URL are external actions of the project owner.
 | Path | Purpose |
 | --- | --- |
 | `privacy-policy.html` | Standalone Russian store-facing privacy policy (`<html lang="ru">`). Inline CSS, no JS, no external resources, no cookies. |
+| `ru.html` | RU landing page for professionals: who it fits, how masking works, formats, honest limits. Static, inline CSS, no JS, no external assets. |
+| `verify.html` | Verification page: byte-exact restore, DevTools zero-network check for manual mode, permissions, threat model. Static, no JS, no external assets. |
 | `chrome-listing.md` | Chrome Web Store listing copy, permission justifications, data-use answers, review instructions. |
 | `edge-listing.md` | Edge Add-ons listing copy and Edge-specific privacy/test notes. |
 | `review-notes.md` | Step-by-step reviewer instructions (manual mode, formats, PDF, lock/fail-closed, auto path). |

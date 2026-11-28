@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="DocsMasked Relay — локальное расширение для Chrome и Edge: заменяет персональные данные в файлах метками перед отправкой в ChatGPT и возвращает исходные значения при скачивании. Без аккаунта, сервера и телеметрии."
+    />
+    <title>DocsMasked Relay — файлы для ChatGPT без лишних персональных данных</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #ffffff;
+        --fg: #1c1e21;
+        --muted: #5b6169;
+        --accent: #1f6feb;
+        --accent-soft: #e8f0fe;
+        --rule: #dfe3e8;
+        --panel: #f6f8fa;
+        --warn: #9a6700;
+        --warn-bg: #fff8e5;
+        --ok: #1a7f37;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #121417;
+          --fg: #e6e8eb;
+          --muted: #a1a8b2;
+          --accent: #6ea8fe;
+          --accent-soft: #17253d;
+          --rule: #2c3138;
+          --panel: #1a1d21;
+          --warn: #e3b341;
+          --warn-bg: #2a2313;
+          --ok: #56d364;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font: 16px/1.65 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      }
+      a {
+        color: var(--accent);
+      }
+      main {
+        max-width: 64rem;
+        margin: 0 auto;
+        padding: 0 1.25rem 4rem;
+      }
+      .topbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem 1.25rem;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--rule);
+      }
+      .brand {
+        font-weight: 700;
+        letter-spacing: 0.01em;
+        text-decoration: none;
+        color: var(--fg);
+      }
+      .brand span {
+        color: var(--accent);
+      }
+      .topbar nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 1rem;
+        font-size: 0.92rem;
+      }
+      .topbar nav a {
+        text-decoration: none;
+      }
+      .hero {
+        padding: 3.2rem 0 1.6rem;
+        max-width: 52rem;
+      }
+      .eyebrow {
+        display: inline-block;
+        margin: 0 0 0.9rem;
+        padding: 0.25rem 0.6rem;
+        border: 1px solid var(--rule);
+        border-radius: 999px;
+        color: var(--muted);
+        font-size: 0.82rem;
+        letter-spacing: 0.02em;
+      }
+      h1 {
+        font-size: clamp(2rem, 6vw, 3.25rem);
+        line-height: 1.12;
+        letter-spacing: -0.02em;
+        margin: 0 0 1rem;
+      }
+      h1 em {
+        font-style: normal;
+        color: var(--accent);
+      }
+      .lede {
+        font-size: clamp(1.02rem, 2.2vw, 1.2rem);
+        color: var(--muted);
+        margin: 0 0 1.5rem;
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin: 0 0 1.3rem;
+      }
+      .button {
+        display: inline-block;
+        padding: 0.7rem 1.05rem;
+        border-radius: 8px;
+        border: 1px solid var(--accent);
+        background: var(--accent);
+        color: #fff;
+        font-weight: 600;
+        text-decoration: none;
+      }
+      .button.secondary {
+        background: transparent;
+        color: var(--accent);
+      }
+      .button:hover {
+        filter: brightness(1.06);
+      }
+      .fine {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin: 0;
+      }
+      section {
+        margin: 2.8rem 0 0;
+      }
+      h2 {
+        font-size: clamp(1.35rem, 3vw, 1.7rem);
+        line-height: 1.25;
+        margin: 0 0 0.6rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--rule);
+      }
+      h3 {
+        font-size: 1.05rem;
+        margin: 0 0 0.35rem;
+      }
+      p,
+      li {
+        margin: 0.55rem 0;
+      }
+      ul {
+        padding-left: 1.35rem;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+        gap: 0.9rem;
+        margin: 1rem 0 0;
+      }
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--rule);
+        border-radius: 10px;
+        padding: 1rem 1.05rem;
+      }
+      .card p {
+        margin: 0.25rem 0 0;
+        color: var(--muted);
+        font-size: 0.94rem;
+      }
+      .steps {
+        counter-reset: step;
+        list-style: none;
+        padding: 0;
+        margin: 1rem 0 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+        gap: 0.9rem;
+      }
+      .steps li {
+        counter-increment: step;
+        background: var(--panel);
+        border: 1px solid var(--rule);
+        border-radius: 10px;
+        padding: 1rem 1.05rem;
+        margin: 0;
+      }
+      .steps li::before {
+        content: counter(step);
+        display: inline-grid;
+        place-items: center;
+        width: 1.75rem;
+        height: 1.75rem;
+        margin-bottom: 0.5rem;
+        border-radius: 50%;
+        background: var(--accent);
+        color: #fff;
+        font-size: 0.9rem;
+        font-weight: 700;
+      }
+      .steps strong {
+        display: block;
+        margin-bottom: 0.2rem;
+      }
+      .steps span {
+        color: var(--muted);
+        font-size: 0.94rem;
+      }
+      .callout {
+        background: var(--panel);
+        border-left: 4px solid var(--accent);
+        padding: 0.9rem 1.1rem;
+        margin: 1.2rem 0;
+        border-radius: 0 8px 8px 0;
+      }
+      .callout strong {
+        display: block;
+        margin-bottom: 0.3rem;
+      }
+      .callout.warn {
+        border-left-color: var(--warn);
+        background: var(--warn-bg);
+      }
+      .callout.warn strong {
+        color: var(--warn);
+      }
+      .split {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+        gap: 1rem 1.4rem;
+        margin-top: 1rem;
+      }
+      .panel {
+        border: 1px solid var(--rule);
+        border-radius: 10px;
+        padding: 1rem 1.1rem;
+      }
+      .panel h3 {
+        margin-top: 0;
+      }
+      .panel ul {
+        margin: 0.3rem 0 0;
+      }
+      .table-wrap {
+        overflow-x: auto;
+        margin: 1rem 0 0;
+        border: 1px solid var(--rule);
+        border-radius: 10px;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        min-width: 34rem;
+        font-size: 0.94rem;
+      }
+      th,
+      td {
+        border-bottom: 1px solid var(--rule);
+        padding: 0.6rem 0.75rem;
+        text-align: left;
+        vertical-align: top;
+      }
+      tr:last-child td {
+        border-bottom: 0;
+      }
+      th {
+        background: var(--panel);
+        font-weight: 650;
+      }
+      code {
+        font: 0.9em ui-monospace, SFMono-Regular, Consolas, monospace;
+        background: var(--panel);
+        padding: 0.1em 0.3em;
+        border-radius: 4px;
+        overflow-wrap: anywhere;
+      }
+      .tag {
+        color: var(--accent);
+        font-weight: 600;
+      }
+      .links {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+        gap: 0.75rem;
+        margin-top: 1rem;
+      }
+      .links a {
+        display: block;
+        border: 1px solid var(--rule);
+        border-radius: 10px;
+        padding: 0.85rem 1rem;
+        text-decoration: none;
+        color: var(--fg);
+      }
+      .links a strong {
+        display: block;
+        color: var(--accent);
+        margin-bottom: 0.1rem;
+      }
+      .links a span {
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+      footer {
+        margin-top: 3rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--rule);
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+      footer p {
+        margin: 0.35rem 0;
+      }
+      @media (max-width: 640px) {
+        main {
+          padding: 0 1rem 3rem;
+        }
+        .hero {
+          padding-top: 2.2rem;
+        }
+        .topbar nav {
+          font-size: 0.86rem;
+        }
+        .button {
+          width: 100%;
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header class="topbar">
+        <a class="brand" href="./ru.html">DocsMasked <span>Relay</span></a>
+        <nav aria-label="Разделы страницы">
+          <a href="#dlya-kogo">Кому подходит</a>
+          <a href="#roundtrip">Восстановление</a>
+          <a href="#offline">Ручной режим</a>
+          <a href="./verify.html">Проверка</a>
+          <a href="./privacy-policy.html">Приватность</a>
+        </nav>
+      </header>
+
+      <div class="hero">
+        <p class="eyebrow">Chrome и Edge · локально · без аккаунта</p>
+        <h1>Файлы для ChatGPT без лишних <em>персональных данных</em></h1>
+        <p class="lede">
+          DocsMasked Relay заменяет имена, телефоны, адреса и другие данные в файле
+          метками перед отправкой и возвращает исходные значения при скачивании. Всё
+          происходит в браузере: без аккаунта, сервера и телеметрии.
+        </p>
+        <div class="actions">
+          <a
+            class="button"
+            href="https://chromewebstore.google.com/detail/docsmasked-relay/iieopopifchankeeciiekichbcfdbdnl"
+            >Установить из Chrome Web Store</a
+          >
+          <a class="button secondary" href="./verify.html">Проверить локальность</a>
+        </div>
+        <p class="fine">
+          Исходные значения, соответствия меток и ключи шифрования остаются на устройстве.
+          В ChatGPT уходит только обезличенная копия файла, его обезличенное имя и обычные
+          метаданные загрузки. Расширение не защищает от OpenAI: загруженный файл хранится
+          по правилам OpenAI.
+        </p>
+      </div>
+
+      <section id="dlya-kogo">
+        <h2>Для специалистов, которые работают с документами</h2>
+        <p>
+          Не «для всех сразу», а для тех, кто регулярно отправляет в ChatGPT договоры,
+          таблицы, выгрузки и переписку — и хочет убрать лишние данные до отправки, не
+          теряя возможность вернуть точные значения в скачанном файле.
+        </p>
+        <div class="grid">
+          <div class="card">
+            <h3>Юристы</h3>
+            <p>
+              Договоры, доверенности, претензии: обезличить стороны и реквизиты, получить
+              разбор или черновик, вернуть исходные формулировки в документ.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Бухгалтеры</h3>
+            <p>
+              Ведомости, выгрузки, акты: скрыть ФИО и контакты сотрудников и
+              контрагентов, сохранив структуру таблиц и суммы.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Клиники и медицинские центры</h3>
+            <p>
+              Обезличить текстовые документы перед разбором. Важно: изображения,
+              вложения и сканы без текстового слоя расширение не проверяет.
+            </p>
+          </div>
+          <div class="card">
+            <h3>HR и рекрутинг</h3>
+            <p>
+              Резюме и описания вакансий: заменить контакты и имена, сохранить опыт и
+              навыки для анализа, восстановить исходные данные в скачанном файле.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Аналитики и разработчики</h3>
+            <p>
+              JSON, XML, HTML и Excel-выгрузки: объяснить схему или запрос, не отправляя
+              реальные значения клиентов. Структурные ключи и структура остаются на месте;
+              ключ, который сам содержит PII, может быть замаскирован.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="kak-rabotaet">
+        <h2>Как это работает</h2>
+        <ol class="steps">
+          <li>
+            <strong>Вы выбираете файл</strong>
+            <span>
+              В ChatGPT или в ручном режиме расширения. Поддерживаются документы Word и
+              Excel, текстовые и структурированные файлы, PDF.
+            </span>
+          </li>
+          <li>
+            <strong>Расширение заменяет данные локально</strong>
+            <span>
+              Детекторы находят включённые категории и ставят метки вида
+              <code>[[DM7F3_PERSON_1]]</code>. Соответствия шифруются и сохраняются в
+              хранилище на устройстве.
+            </span>
+          </li>
+          <li>
+            <strong>Вы скачиваете и получаете исходное</strong>
+            <span>
+              Файл с метками можно скачать из чата: расширение вернёт исходные значения и
+              имя. Для PDF восстановление не предусмотрено — это односторонняя
+              редакция.
+            </span>
+          </li>
+        </ol>
+        <p>
+          Поддерживаемые форматы: DOCX, XLSX, TXT, MD, JSON/JSONL, XML, HTML и PDF. Старые
+          DOC/XLS конвертируются в современные форматы с возможной потерей вёрстки.
+        </p>
+      </section>
+
+      <section id="roundtrip">
+        <h2>Байт-точный round-trip, а не пересказ документа</h2>
+        <p>
+          Расширение не перерисовывает файл и не пропускает его через «умный» редактор.
+          Оно меняет только те участки, где найдены данные, а остальные байты оставляет
+          как были: кодировку, BOM, переводы строк, отступы, структурные ключи JSON, имена
+          элементов XML, разметку HTML, структуру и вёрстку офисных документов. Если ключ
+          JSON сам содержит PII (например, email), он может быть замаскирован.
+        </p>
+        <div class="split">
+          <div class="panel">
+            <h3>Что сохраняется</h3>
+            <ul>
+              <li>исходная кодировка и BOM для текстовых форматов;</li>
+              <li>смешанные переводы строк и форматирование JSON/XML;</li>
+              <li>структурные ключи, имена элементов и атрибутов; ключ, содержащий PII,
+                может быть замаскирован;</li>
+              <li>стили, листы и структура DOCX/XLSX в пределах поддерживаемых частей;</li>
+              <li>имя файла и привязка кодов хранилища при восстановлении.</li>
+            </ul>
+          </div>
+          <div class="panel">
+            <h3>Что важно знать</h3>
+            <ul>
+              <li>PDF редактируется необратимо: восстановить исходный PDF нельзя;</li>
+              <li>сканы без текстового слоя блокируются, OCR в 0.2.x нет;</li>
+              <li>старые DOC/XLS конвертируются с потерей вёрстки;</li>
+              <li>DOCX/XLSX восстанавливают значения и вёрстку, но побайтовое совпадение
+                всего ZIP-контейнера не гарантируется;</li>
+              <li>детекторы вероятностны: возможны пропуски и лишние замены.</li>
+            </ul>
+          </div>
+        </div>
+        <p>
+          Подробное определение, таблица форматов и честные ограничения — на странице
+          <a href="./verify.html">«Проверка байт-точного восстановления и отсутствия сети»</a>.
+        </p>
+      </section>
+
+      <section id="offline">
+        <h2>Ручной режим: без ChatGPT и без сети</h2>
+        <p>
+          Ручной режим в окне расширения обезличивает или восстанавливает выбранный файл
+          без открытия ChatGPT. Он не делает сетевых запросов: файл читается локально,
+          результат сохраняется через локальную ссылку на blob. Это запасной путь, если
+          сайт изменился, и способ проверить поведение расширения на синтетическом файле.
+        </p>
+        <div class="callout">
+          <strong>Как убедиться самостоятельно</strong>
+          Откройте DevTools служебного worker расширения, вкладку Network, очистите журнал
+          и выполните «Анонимизировать» и «Восстановить» на синтетическом файле. Внешних
+          запросов быть не должно. Пошаговая инструкция — в
+          <a href="./verify.html#network">разделе проверки сети</a>.
+        </div>
+      </section>
+
+      <section id="structured">
+        <h2>Отдельный сценарий: структурированные данные</h2>
+        <p>
+          Для аналитиков, разработчиков и поддержки особенно важен JSON, XML, HTML и
+          Excel: структурная схема и структурные ключи должны остаться прежними, а
+          значения — замениться метками. Если ключ сам содержит PII (например, email), он
+          тоже может быть замаскирован. Модель сможет объяснить структуру, написать запрос
+          или найти ошибку, не получая реальные имена, телефоны и номера.
+        </p>
+        <div class="callout">
+          <strong>Пример</strong>
+          Было: <code>"full_name": "Иванов Иван Иванович"</code>. Стало:
+          <code>"full_name": "[[DM7F3_PERSON_1]]"</code>. Структурный ключ
+          <code>full_name</code>, кавычки, отступы и соседние поля не изменились. При
+          скачивании расширение вернёт исходное значение, если файл не редактировали вручную.
+        </div>
+        <p>
+          Подробный разбор профиля пользователей, примеры до/после и сценарий демо хранятся
+          во внутренней документации проекта и не публикуются. На этой странице — только
+          проверяемые утверждения о поведении расширения.
+        </p>
+      </section>
+
+      <section id="granicy">
+        <h2>Границы и честные формулировки</h2>
+        <div class="callout warn">
+          <strong>Расширение помогает снизить риск, но не даёт гарантий</strong>
+          Оно не защищает от OpenAI и не отменяет правила сервиса. Обезличенный файл,
+          который вы отправили, хранится у OpenAI. Это не юридическая консультация и не
+          сертификат соответствия 152-ФЗ или GDPR. Решение о том, какие данные можно
+          отправлять, остаётся за вами и вашей организацией.
+        </div>
+        <ul>
+          <li>Нет OCR: сканы и изображения с текстом не распознаются.</li>
+          <li>Изображения, встроенные объекты, диаграммы и вложения внутри документов не проверяются.</li>
+          <li>Эвристики могут пропустить данные или заменить лишнее; проверка утечек снижает, но не устраняет риск.</li>
+          <li>Скомпрометированные браузер, профиль или другие расширения вне модели угроз.</li>
+          <li>PDF после необратимого удаления не восстанавливается.</li>
+          <li>Неизвестные или небезопасные структуры JSON/XML/HTML отклоняются целиком (fail-closed).</li>
+        </ul>
+      </section>
+
+      <section id="links">
+        <h2>Ссылки</h2>
+        <div class="links">
+          <a
+            href="https://chromewebstore.google.com/detail/docsmasked-relay/iieopopifchankeeciiekichbcfdbdnl"
+          >
+            <strong>Chrome Web Store</strong>
+            <span>Установка и карточка расширения</span>
+          </a>
+          <a href="./privacy-policy.html">
+            <strong>Политика конфиденциальности</strong>
+            <span>Какие данные обрабатываются и что покидает устройство</span>
+          </a>
+          <a href="./verify.html">
+            <strong>Проверка локальности</strong>
+            <span>Байт-точное восстановление, DevTools, разрешения, модель угроз</span>
+          </a>
+          <a href="https://github.com/OniVe/docs-masked-relay">
+            <strong>GitHub</strong>
+            <span>Исходный код, SECURITY.md, issues</span>
+          </a>
+        </div>
+      </section>
+
+      <footer>
+        <p>
+          DocsMasked Relay · локальное расширение для Chrome и Edge · интерфейс на русском
+          языке.
+        </p>
+        <p>
+          На этой странице нет cookies, скриптов, аналитики и внешних ресурсов. Ссылки ведут
+          на сайты, которые открываются только по вашему нажатию.
+        </p>
+      </footer>
+    </main>
+  </body>
+</html>
