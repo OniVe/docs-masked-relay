@@ -22,6 +22,10 @@ the project owner.
   "updated 2026-11-25". The dashboard status check on 2026-11-28 timed out, so the
   public-listing observation is the evidence of record: version 0.2.2 is served to users.
   Earlier dashboard state was `Ожидает рассмотрения` (draft 0.2.2; published 0.2.1).
+- **Listing update (2026-11-28)**: website set to
+  `https://onive.github.io/docs-masked-relay/store/ru.html`; full description replaced with
+  the landing-page positioning text; short summary unchanged (package-derived, read-only).
+  Submitted for review; dashboard status: `Ожидает рассмотрения`.
 
 Current package facts are recorded in `store/packages/README.md`.
 
