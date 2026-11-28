@@ -34,14 +34,12 @@ a single self-contained file with no external requests.
 
 ### Option A — GitHub Pages
 
-1. Make the repository public (or use a public `docs`/`gh-pages` repository).
-2. Copy `store/privacy-policy.html` to `docs/privacy/index.html` (or publish the `docs/`
-   folder from the `main` branch).
-3. In the repository settings, enable Pages for the branch/folder.
-4. The URL will look like:
-   `https://<owner>.github.io/<repo>/privacy/` (project site) or
-   `https://<owner>.github.io/privacy/` (user site).
-5. Open the URL in a private window and verify it loads over HTTPS without mixed content.
+The repository is public and Pages is configured for branch `main`, folder `/` (root).
+`store/privacy-policy.html` is served at:
+
+`https://<owner>.github.io/<repo>/store/privacy-policy.html`
+
+Open the URL in a private window and verify it loads over HTTPS without mixed content.
 
 ### Option B — any static host
 

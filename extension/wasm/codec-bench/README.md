@@ -7,8 +7,7 @@ the current JavaScript paths:
 - `quick-xml` against `saxes` for XML tokenization;
 - `miniz_oxide` against `fflate` for ZIP/DEFLATE and zlib streams.
 
-The measured results and the integration decision live in
-[`../../docs/perf-p1-codec.md`](../../docs/perf-p1-codec.md).
+The measured results and the integration decision are kept in the benchmark history.
 
 ## Build
 

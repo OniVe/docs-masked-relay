@@ -26,7 +26,7 @@ const MASK_BUDGET_MS = Number(process.env.PERF_MASK_BUDGET_MS ?? 500);
 /**
  * Hard gate for a name-dense 8k mask. The full PERSON detector dominates the
  * end-to-end number; a 25 MB name-dense corpus is rejected fail-closed by the
- * PERSON density guard (see docs/perf-p1-integration.md). 1500 ms catches a
+ * PERSON density guard. 1500 ms catches a
  * real regression without turning machine noise into a failure. The 500 ms
  * finding budget stays advisory and is reported, never gated (R22-PERF-1).
  */

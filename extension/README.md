@@ -50,8 +50,8 @@ DocsMasked Relay — расширение для браузера, которо�
 
 - Политика конфиденциальности: [`PRIVACY.md`](./PRIVACY.md)
 - Модель угроз и ключи: [`SECURITY.md`](./SECURITY.md)
-- Safari-сборка и подпись: [`docs/safari-build.md`](./docs/safari-build.md)
-- Спецификация: [`../docs/planning/extension-spec.md`](../docs/planning/extension-spec.md)
+- Safari-сборка: `bun run build:safari` (подпись — отдельно на macOS).
+- Технические детали: [`SECURITY.md`](./SECURITY.md).
 
 ## Что делает
 
@@ -164,8 +164,7 @@ DM_CHROMIUM_BINARY="C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe
 4. При скачивании файла расширение находит метки по коду хранилища и возвращает исходные
    имена и байты.
 
-Технические подробности реализации — в [`SECURITY.md`](./SECURITY.md) и в спецификации
-[`../docs/planning/extension-spec.md`](../docs/planning/extension-spec.md).
+Технические подробности реализации — в [`SECURITY.md`](./SECURITY.md).
 
 ## Ограничения
 
@@ -310,7 +309,7 @@ open build/safari/DocsMasked\ Relay/DocsMasked\ Relay.xcodeproj
 ```
 
 Далее в Xcode: signing team, bundle id, version/build, `PrivacyInfo.xcprivacy`, App Store
-или Developer ID + notarization. Подробно — [`docs/safari-build.md`](./docs/safari-build.md).
+или Developer ID + notarization. Подробно — в `wxt.config.ts` и `bun run build:safari`.
 
 Safari manifest: `background.scripts` + `persistent:false`, без `offscreen`/`downloads`;
 PDF обрабатывается в background page. Требуется Safari 18+ (static MAIN world).
